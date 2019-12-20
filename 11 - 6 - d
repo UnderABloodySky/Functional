@@ -1,0 +1,64 @@
+soloLasCapasQue :: (Ingrediente -> Bool) -> Pizza -> Pizza
+soloLasCapasQue _ Prepizza = Prepizza
+soloLasCapasQue f (Capa i pizza) = if f i
+										then Capa i (soloLasCapasQue f pizza)
+										else soloLasCapasQue f pizza
+
+cantidadCapasQueCumplen :: (Ingrediente -> Bool) -> Pizza -> Int
+cantidadCapasQueCumplen _ Prepizza = 0 
+cantidadCapasQueCumplen f (Capa i pizza) = evaluate f i + (cantidadCapasQueCumplen f pizza)
+
+evaluate :: (a -> Bool) -> a -> Int
+evaluate f x = if f x
+					then 1
+					else 0
+
+
+Prop: cantidadCapasQueCumplen f . soloLasCapasQue f ​ = cantidadCapasQueCumplen f
+
+
+(cantidadCapasQueCumplen f . soloLasCapasQue f) p
+=							(def (.))
+cantidadCapasQueCumplen f (soloLasCapasQue f p)
+
+
+Dem: 
+	Por principio de extensionalidad
+
+	V p :: Pizza . cantidadCapasQueCumplen f (soloLasCapasQue f p) ​ = cantidadCapasQueCumplen f p
+
+Por principio de induccion estructural, en la estructura de p (p :: Pizza). Sea p una Pizza fija tal que:
+
+
+* Caso base: p = Prepizza
+
+cantidadCapasQueCumplen f (soloLasCapasQue f Prepizza)
+=						(def soloLasCapasQue.1)
+cantidadCapasQueCumplen f Prepizza
+=						(def cantidadCapasQueCumplen.1)
+0
+
+cantidadCapasQueCumplen f Prepizza
+=						(def cantidadCapasQueCumplen.1)
+0
+
+
+* Caso inductivo: p = Capa i p'
+
+		HI: cantidadCapasQueCumplen f (soloLasCapasQue f p') ​ = cantidadCapasQueCumplen f p'
+		TI: cantidadCapasQueCumplen f (soloLasCapasQue f (Capa i p')) ​ = cantidadCapasQueCumplen f (Capa i p')
+
+cantidadCapasQueCumplen f (soloLasCapasQue f (Capa i p'))
+=						(def solo)
+
+
+
+cantidadCapasQueCumplen f (Capa i p')
+=						(def cantidadCapasQueCumplen.2)
+evaluate f i + cantidadCapasQueCumplen f p'
+=						(HI)
+evaluate f i + cantidadCapasQueCumplen f (soloLasCapasQue f p')
+=						(def cantidadCapasQueCumplen.2)
+cantidadCapasQueCumplen f (Capa i (soloLasCapasQue f p'))
+=						(def soloCapasQue.2)
+cantidadCapasQueCumplen f (soloLasCapasQue f (Capa i p'))

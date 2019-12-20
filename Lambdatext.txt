@@ -1,0 +1,165 @@
+add :: Nat -> Nat
+add n m = n . m
+
+zero :: Nat
+zero = id
+
+succc = (+1)
+
+toInt :: Nat -> Int
+toInt n = n 0
+
+fromInt :: Int -> Nat
+fromInt 0 = 0
+fromInt n = succ (fromInt n)
+
+			Esto es S
+type Nat = (a -> a) -> a -> a       Similar a fold, se pasa como tratar el caso "inductivo" y el caso base.
+						Esto es Z
+
+zero :: Nat
+zero = \s z -> z
+
+one :: Nat
+one = \s z -> s z
+
+add :: Nat -> Nat -> Nat
+add n m = \s z -> m s (n s z)
+
+toSNat :: Nat -> SNat
+toSNat n = n S Z
+
+toPares :: Nat -> INt
+toPares n = n (+2) 0
+
+toUnario :: Nat -> [()]
+toUnario n = n (() : ) []
+
+toInt:: Nat -> Int
+toInt n = n (+1) 0
+
+fromInt :: Int -> Nat (Esto es many)
+fromInt 0 = zero
+fromInt n = \s z -> s (fromInt (n-1))
+
+church encoding Una forma de representacion de cosas con lambda calculo
+
+loop = (\x x -> x y) (\x -> x x) (x -> x x) Se queda escribiendo hasta el infinito
+
+type Set a = a -> Bool Representa los constructores con la funcion a -> Bool
+Es decir, la Funcion es una representacion de un conjunto de a.
+
+empty :: Set a 
+empty = const False
+
+unit :: a -> Set a
+unit e = \x -> e == x
+
+add :: a -> Set a -> Set a
+add e s = \x > e == x || s x
+
+union :: Set a -> Set a -> Set a
+union s1 s2 = \x s1 x || s2 x
+
+diff :: Set a -> Set a -> Set a 
+diff s1 s2 = \x -> s1 x && not (s2 x)
+
+remove :: a -> Set a -> Set a
+remove e s = \ x e /= x && s x
+
+type multiSet a = a -> Int (Cambiar los || por mas, && por - y asi)
+
+type Map k v = k -> Maybe v
+
+Ver patron builder - Construye de a poco pero solo aplica cuando se le dice .build() 
+(Preguntarle a Gonzalo sobre api fluent)
+(En la materia Caracteristicas de Lenguajes de programacion se ve puros lambdas.)
+
+type DList a = [a] -> [a] //Todo es 0(1)
+(diferent list en Haskell)
+
+nill = \xs -> xs
+
+singleton :: a -> DList a
+singleton x = (\xs -> x:xs) (Aca te van a pasar la lista vacia)
+
+cons x xs = \ys -> x : xs ys
+
+append xs ys = xs . ys 
+-- El codigo de todo problema es equivalente a la representacion simbolica de un numero
+
+toList :: DList a -> [a]
+toList xs = xs []
+
+head xs = head (toList xs)
+
+tail xs = fromList (tail (toList xs))
+
+
+Los tipos son funciones y se llaman constructores de Tipo.
+Existen sistemas de tipos para tipos.
+
+			forall a . (Para encapsular ese a y sacar el parametro a la izquierda del igual)
+type Bool = a -> a -> a
+
+true = \t f -> t
+false = \f t -> f
+
+if :: Bool -> a -> a -> a
+if b x y = b x y
+
+and b1 b2 = \t f -> b1 (b2 t f) f
+
+and a b = a b false
+
+or a b = a true b
+
+not p = Undefined --falta
+
+xor a b = a (not b) b 
+
+
+type Pair a b = (a -> b -> c) -> c Dice c por que devuelve o un a o un b, nunca va a ser un tercer tipo.
+
+pair x y = \f -> f x y //Modela la proyeccion a nivel matematico.
+
+
+fst :: Pair a b -> a
+fst p = p (\x y -> x) -- const
+
+snd :: Pair a b -> b
+snd p = p (\x y -> y) -- Flip con const
+
+swap :: Par a b -> Par a b
+swap p = p (\x y -> Pair y x)
+ 
+
+* type EncodingList a = (a -> b-> b) -> b -> b
+
+nil = \f -> \z -> z
+
+cons x xs = \f z -> f x (xs f z)
+
+singleton x = cons x nill
+
+toList xs = xs (:) []
+
+toDList xs = xs cons nill
+
+foldC f z xs = xs f z
+
+fromList :: [a] -> EncodingList a
+fromList [] = nill
+fromList (x:xs) = cons x (fromList xs)
+
+
+* data Tree a = Emptyt | NodeT a (Tree a) (Tree a)
+
+type ChurchTree = b -> (a -> b -> b -> b) -> b (Igual a fold) 
+(No agarra el arbol por que esto es el arbol, o mejor dicho la funcion que la representa)
+
+Todo lenguaje se puede representar con solo 2 funciones:
+
+k x y = x 			(Esto es const)
+s f g = f x (g x) 
+

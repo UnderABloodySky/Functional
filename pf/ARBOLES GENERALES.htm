@@ -1,0 +1,732 @@
+<!--
+Proyecto: Estructuras de Datos
+Fichero:  arboles_gen.html
+Fecha:    21/07/00
+-->
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+   <title> ARBOLES GENERALES </title>
+<link rel="stylesheet" type="text/javascript" href="ARBOLES%20GENERALES_archivos/estilo.html">
+</head>
+<body background="ARBOLES%20GENERALES_archivos/anilla02.jpg">
+
+<script>
+window.defaultStatus="Arboles Generales.";
+</script>
+
+<br><h1>ARBOLES GENERALES</h1><hr noshade="noshade">
+<br><br><h2>1. INTRODUCCIÓN.</h2>
+
+<p>Hasta ahora las estructuras de datos que hemos estudiado eran de tipo lineal, o sea,existía una 
+relación de anterior y siguiente entre los elementos que la componían(cada elemento tendrá uno anterior
+y otro posterior , salvo los casos de primero y último).Pues bien, aquí se va a estudiar una
+estructuración de los datos más compleja: los árboles.<br>
+</p><p>Este tipo de estructura es usual incluso fuera del campo de la informática.El lector seguramente
+conoce casos como los árboles gramaticales para analizar oraciones,los árboles genealógicos ,representación
+de jerarquías,etc...La estructuración en árbol de los elementos es fundamental dentro del 
+campo de la informática aplicándose en una amplia variedad de problemas como veremos más adelante.<br>
+</p><p>En principio podemos considerar la estructura de árbol de manera intuitiva como una estructura
+jerárquica.Por tanto,para estructurar un conjunto de elementos e<sub>i</sub> en árbol,
+deberemos escoger uno de ellos e<sub>1</sub> al que llamaremos <i>raíz del árbol</i>.Del resto
+de los elementos se selecciona un subconjunto e<sub>2</sub>,...,e<sub>k</sub> estableciendo
+una <i>relación padre-hijo</i> entre la raíz y cada uno de dichos elementos de manera que 
+e<sub>1</sub> es llamado el padre de e<sub>2</sub>,de e<sub>3</sub>,...e<sub>k</sub> y cada 
+uno de ellos es llamado un hijo de e<sub>1</sub>.Iterativamente podemos realizar la misma
+operación para cada uno de estos elementos asignando a cada uno de ellos un número de 0 o más
+hijos hasta que no tengamos más elementos que insertar.El único elemento que no tiene padre
+es e<sub>1</sub>,la raíz del árbol.Por otro lado hay un conjunto de elementos que no tienen hijos
+aunque sí padre que son llamados hojas.Como hemos visto la relación de paternidad es una relación
+uno a muchos.<br>
+</p><p>Para tratar esta estructura cambiaremos la notación:</p><p>
+</p><ul><li>Las listas tienen posiciones.Los árboles tienen nodos.</li><br>
+<li>Las listas tienen un elemento en cada posición.Los árboles tienen una etiqueta en cada
+nodo (algunos autores distinguen entre árboles con y sin etiquetas.Un árbol sin etiquetas
+tiene sentido aunque en la inmensa mayoría de los problemas necesitaremos etiquetar los nodos.
+Es por ello por lo que a partir de ahora sólo haremos referencia a árboles etiquetados).</li></ul><br><br>
+<p>Usando esta notación,un árbol tiene uno y sólo un nodo raíz y uno o más nodos hoja.</p><p>
+</p><p>Desde un punto de vista formal la estructura de datos árbol es un caso particular de grafo,
+más concretamente,en la teoría de grafos se denota de forma similar como <i>árbol dirigido</i>.
+A pesar de ello,la definición formal más usual de árbol en ciencias de la computación es la 
+recursiva:<br>
+</p><ul><li>El caso básico es un árbol con un único nodo.Lógicamente este nodo es a la vez raíz y
+hoja del árbol.</li><br>
+<li>Para construir un nuevo árbol a partir de un nodo n<sub>r</sub> y <i>k</i> árboles A<sub>1</sub>
+,A<sub>2</sub>,...,A<sub>k</sub> de raíces n<sub>1</sub>,n<sub>2</sub>,...,n<sub>k</sub> con
+N<sub>1</sub>,N<sub>2</sub>,...,N<sub>k</sub> elementos cada uno establecemos una relación 
+padre-hijo entre n<sub>r</sub> y cada una de las raíces de los <i>k</i> árboles.El árbol
+resultante de N=1 + N<sub>1</sub> + ... + N<sub>k</sub> nodos tiene como raíz el nodo n<sub>r</sub>,
+los nodos n<sub>1</sub>,n<sub>2</sub>,...,n<sub>k</sub> son los hijos de n<sub>r</sub> y el 
+conjunto de nodos hoja está formado por la unión de los <i>k</i> conjuntos hojas iniciales.
+Además a cada uno de los A<sub>i</sub> se les denota subárboles de la raíz.</li></ul><br>
+<p>Ejemplo: Consideremos el ejemplo de la siguiente figura.
+<br><br></p><center><img src="ARBOLES%20GENERALES_archivos/arbgen1.gif"></center><br><br>
+<p>Podemos observar que cada uno de los identificadores representa un nodo y la relación 
+padre-hijo se señala con una línea.Los árboles normalmente se presentan en forma descendente
+y se interpretan de la siguiente forma:<br>
+</p><ul><li><i>E</i> es la raíz del árbol.</li><br>
+<li><i>S1,S2,S3</i> son los hijos de <i>E</i>.</li><br>
+<li><i>S1,D1</i> componen un subárbol de la raíz.</li><br>
+<li><i>D1,T1,T2,T3,D3,S3</i> son las hojas del árbol.</li><br>
+<li>etc...</li><br><br>
+Además de los términos introducidos consideraremos la siguiente terminología:<p>
+</p><ol><li><b>Grado de salida</b> o simplemente <b>grado</b>.Se denomina grado de un nodo al 
+número de hijos que tiene.Así el grado de un nodo hoja es cero.En la figura anterior el nodo
+con etiqueta <i>E</i> tiene grado 3.</li><br><br>
+<li><b>Caminos</b>.Si n<sub>1</sub>,n<sub>2</sub>,...,n<sub>k</sub> es una sucesión de 
+nodos en un árbol tal que n<sub>i</sub> es el padre de n<sub>i+1</sub> para 1&lt;=i&lt;=k-1
+,entonces esta sucesión se llama un camino del nodo n<sub>i</sub> al nodo n<sub>k</sub>.La
+longitud de un camino es el número de nodos menos uno, que haya en el mismo.Existe un camino
+de longitud cero de cada nodo a sí mismo.Ejemplos sobre la figura anterior:<br>
+<ul><li><i>E,S2,D2,T3</i> es un camino de <i>E</i> a <i>T3</i> ya que <i>E</i> es padre de 
+<i>S2</i>,éste es padre de <i>D2</i>,etc.</li><br>
+<li><i>S1,E,S2</i> no es un camino de <i>S1</i> a <i>S2</i> ya que <i>S1</i> no es padre de
+<i>E</i>.</li></ul><br><br>
+</li><li><b>Ancestros y descendientes.</b>Si existe un camino,del nodo <i>a</i> al nodo <i>b</i>
+,entonces <i>a</i> es un ancestro de <i>b</i> y <i>b</i> es un descendiente de <i>a</i>.En
+el ejemplo anterior los ancestros de <i>D2</i> son <i>D2,S2</i> y <i>E</i> y sus descendientes
+<i>D2,T1,T2</i> y <i>T3</i>(cualquier nodo es a la vez ancestro y descendiente de sí mismo).
+Un ancestro o descendiente de un nodo,distinto de sí mismo,se llama un ancestro propio
+o descendiente propio respectivamente.Podemos definir en términos de ancestros y 
+descendientes los conceptos de raíz,hoja y subárbol:<br><br>
+<ul><li>En un árbol,la raíz es el único nodo que no tiene ancestros propios.</li><br>
+<li>Una hoja es un nodo sin descendientes propios.</li><br>
+<li>Un subárbol de un árbol es un nodo,junto con todos sus descendientes.</li></ul><br><br>
+Algunos autores prescinden de las definiciones de ancestro propio y descendiente propio asumiendo
+que un nodo no es ancestro ni descendiente de sí mismo.</li><br><br>
+<li><b>Altura.</b>La altura de un nodo en un árbol es la longitud del mayor de los caminos
+del nodo a cada hoja.La altura de un árbol es la altura de la raíz.Ejemplo: en la 
+figura anterior la altura de <i>S2</i> es 2 y la del árbol es 3.</li><br><br>
+
+<li><b>Profundidad.</b>La profundidad de un nodo es la longitud del único camino de la 
+raíz a ese nodo.Ejemplo: en la figura anterior la profundidad de <i>S2</i> es 1.</li><br><br>
+
+<li><b>Niveles.</b>Dado un árbol de altura <i>h</i> se definen los niveles <i>0...h</i>
+de manera que el nivel <i>i</i> está compuesto por todos los nodos de profundidad <i>i</i>.</li><br><br>
+
+<li><b>Orden de los nodos.</b>Los hijos de un nodo usualmente están ordenados de izquierda
+a derecha.Si deseamos explícitamente ignorar el orden de los dos hijos, nos referiremos 
+a un árbol como un árbol no-ordenado.<br><br>
+La ordenación izquierda-derecha de hermanos puede ser extendida para comparar cualesquiera dos 
+nodos que no están relacionados por la relación ancestro-descendiente.La regla a 
+usar es que si <i>n<sub>1</sub></i> y <i>n<sub>2</sub></i> son hermanos y <i>n<sub>1</sub></i> 
+está a la izquierda de <i>n<sub>2</sub></i>, entonces todos los descendientes de 
+<i>n<sub>1</sub></i>  están a la izquierda de todos los descendientes de <i>n<sub>2</sub></i>.</li></ol>
+
+<br><br><h3>RECORRIDOS DE UN ÁRBOL.</h3>
+<p>En una estructura lineal resulta trivial establecer un criterio de movimiento  por la misma 
+para acceder a los elementos, pero en un árbol esa tarea no resulta tan simple.No obstante,
+existen distintos métodos útiles en que podemos sistemáticamente recorrer
+todos los nodos de un árbol.Los tres recorridos más importantes se denominan 
+<i>preorden,inorden y postorden</i> aunque hay otros recorridos como es el recorrido por niveles.
+</p><p>Si consideramos el esquema general de un árbol tal como muestra la figura siguiente,los
+recorridos se definen como sigue:
+<br><br></p><center><img src="ARBOLES%20GENERALES_archivos/arbgen2.gif"></center><br><br>
+<ol>
+<li>El listado en preorden es:
+<ul>
+	<li>Si el árbol tiene un único elemento, dicho elemento es el listado en 
+preorden.</li><br>
+	<li>Si el árbol tiene más de un elemento,es decir,una estructura como muestra
+la figura 2,el listado en preorden es listar el nodo raíz seguido del listado en preorden
+de cada uno de los subárboles hijos de izquierda a derecha.</li></ul></li><br>
+<li>El listado en inorden es:
+<ul>
+	<li>Si el árbol tiene un único elemento,dicho elemento es el listado en inorden.</li><br>
+	<li>Si el árbol tiene una estructura como muestra la figura 2,el listado en inorden
+es listar el subárbol <i>A<sub>1</sub></i> en inorden,y listar el nodo raíz seguido del 
+listado en inorden de cada uno de los subárboles hijos de izquierda a derecha restantes.
+</li></ul></li><br>
+<li>El listado en postorden es:
+<ul>
+	<li>Si el árbol tiene un único elemento,dicho elemento es el listado en 
+postorden.</li><br>
+	<li>Si el árbol tiene una estructura como muestra la figura 2,el listado en postorden es
+listar en postorden cada uno de los subárboles hijos de izquierda a derecha seguidos por 
+el nodo raíz.</li></ul></li><br>
+<li>El listado por niveles es: desde <i>i=0</i> hasta la altura <i>h</i> del árbol,listar
+de izquierda a derecha los elementos de profundidad <i>i</i>.Como podemos observar,un nodo
+<i>n<sub>1</sub></i> aparece antes que <i>n<sub>2</sub></i> en el listado por niveles si la 
+profundidad de <i>n<sub>1</sub></i> es menor que la profundidad de <i>n<sub>2</sub></i> usando
+el orden de los nodos definido anteriormente para el caso en que tengan la misma profundidad.</li>
+</ol><br>
+Como ejemplo de listados veamos el resultado que se obtendría sobre el árbol
+<i>A</i> de la figura 3.<br><br>
+Los resultados de los listados de preorden,postorden e inorden son los siguientes:
+<br><br><center><img src="ARBOLES%20GENERALES_archivos/arbgen3.gif"></center><br><br>
+<ol>
+<li>Listado preorden.<br>
+<i>A=A<sub>r</sub>=rA<sub>v</sub>A<sub>s</sub>=rvA<sub>u</sub>A<sub>w</sub>A<sub>s</sub>=
+rvuA<sub>w</sub>A<sub>s</sub>=rvuwA<sub>x</sub>A<sub>y</sub>A<sub>z</sub>A<sub>s</sub>=
+rvuwxA<sub>y</sub>A<sub>z</sub>A<sub>s</sub>=rvuwxyA<sub>z</sub>A<sub>s</sub>=rvuwxyzA<sub>s</sub>
+=rvuwxyzsA<sub>p</sub>A<sub>q</sub>=rvuwxyzspA<sub>q</sub>=rvuwxyzspq.</i></li><br>
+<li>Listado postorden.<br>
+<i>A=A<sub>r</sub>=A<sub>v</sub>A<sub>s</sub>r=A<sub>u</sub>A<sub>w</sub>vA<sub>s</sub>r=
+uA<sub>w</sub>vA<sub>s</sub>r=uA<sub>x</sub>A<sub>y</sub>A<sub>z</sub>wvA<sub>s</sub>r=
+uxA<sub>y</sub>A<sub>z</sub>wvA<sub>s</sub>r=uxyA<sub>z</sub>wvA<sub>s</sub>r=uxyzwvA<sub>s</sub>r=
+uxyzwvA<sub>p</sub>A<sub>q</sub>sr=uxyzwvpA<sub>q</sub>sr=uxyzwvpqsr.</i></li><br>
+<li>Listado inorden.<br>
+<i>A=A<sub>r</sub>=A<sub>v</sub>rA<sub>s</sub>=A<sub>u</sub>vA<sub>w</sub>rA<sub>s</sub>=
+uvA<sub>w</sub>rA<sub>s</sub>=uvA<sub>x</sub>wA<sub>y</sub>A<sub>z</sub>rA<sub>s</sub>=uvxw
+A<sub>y</sub>A<sub>z</sub>rA<sub>s</sub>=uvxwyA<sub>z</sub>rA<sub>s</sub>=uvxwyzrA<sub>s</sub>=
+uvxwyzrA<sub>p</sub>sA<sub>q</sub>=uvxwyzrpsA<sub>q</sub>=uvxwyzrpsq.</i></li><br>
+</ol>
+<p>Por último,el listado por niveles de este árbol es el siguiente:<i>r,v,s,u,w,p,q,x,y,z</i>.
+</p><p>Finalmente es interesante conocer que un árbol no puede,en general,recuperarse con uno 
+solo de sus recorridos.Por ejemplo:Dada la lista en inorden:<i>vwyxzrtupsq</i>,los árboles 
+de la figura 4 tienen ese mismo recorrido en inorden.
+<br><br></p><center><img src="ARBOLES%20GENERALES_archivos/arbgen4.gif"></center><br><br>
+
+</ul>
+<br><br><h2>2. UNA APLICACIÓN: ARBOLES DE EXPRESIÓN.</h2>
+<p>Una importante aplicación de los árboles en la informática es la representación 
+de árboles sintácticos,es decir,árboles que contienen las derivaciones de una
+gramática necesarias para obtener una determinada frase de un lenguaje.
+</p><p>Podemos etiquetar los nodos de un árbol con operandos y operadores de manera que un 
+árbol represente una expresión.Por ejemplo. en la figura 5 se representa un árbol 
+con la expresión aritmética (x-y)*(z/t).
+<br><br></p><center><img src="ARBOLES%20GENERALES_archivos/arbgen5.gif"></center><br><br>
+<p>Para que un árbol represente una expresión,hay que tener en cuenta que:
+</p><ul>
+<li>Cualquier hoja está etiquetada con uno y sólo un operando.</li><br>
+<li>Cualquier nodo interior <i>n</i> está etiquetado por un operador.</li><br>
+</ul>
+<p>En los árboles de expresión,la sucesión del <b>preorden</b> de etiquetas nos
+da lo que se conoce como la forma prefijo de una expresión, en la que el operador precede
+a su operando izquierdo y su operando derecho.En el ejemplo de la figura 5,el preorden de 
+etiquetas del árbol es <i>*-xy/zt</i> .
+</p><p>Análogamente,la sucesión <b>postorden</b> de las etiquetas de un árbol expresión
+nos da lo que se conoce como la representación postfijo de una expresión.Así 
+en el ejemplo,la expresión postfijo del árbol es <i>xy-zt/*</i>.
+</p><p>Finalmente,el <b>inorden</b> de una expresión en un árbol de expresión da la 
+expresión infijo en sí misma,pero sin paréntesis.En el ejemplo,la sucesión
+inorden del árbol anterior es <i>x-y*z/t</i>.
+<br><br></p><h2>3. EL TIPO DE DATO ABSTRACTO "ARBOL".</h2>
+<p>La estructura de árbol puede ser tratada como un tipo de dato abstracto.A continuación 
+presentaremos varias operaciones sobre árboles y veremos como los algoritmos de árboles 
+pueden diseñarse en términos de estas operaciones.Al igual que con otros TDA,existe una gran
+variedad de operaciones que pueden llevarse a cabo sobre árboles.
+</p><p>Como podremos observar,cuando se construye una instancia de este tipo,tiene al menos un elemento,
+es decir,hasta ahora no hemos hablado de la existencia de un árbol vacío .Realmente,
+según la definición que vimos,efectivamente el número mínimo de nodos 
+de un árbol es 1.En las implementaciones usaremos un valor especial ARBOL_VACIO para el caso 
+en que el árbol no contenga nodos,al igual que en listas existe el concepto de lista vacía.
+</p><p>De igual forma es necesario expresar en algunos casos que un nodo no existe para lo cual 
+también usaremos otro valor especial NODO_NULO.Un ejemplo de su uso puede ser cuando 
+intentemos extraer el nodo hijo a la izquierda de un nodo hoja.
+</p><p>A continuación mostramos el conjunto de primitivas que nosotros consideraremos:<br>
+</p><ol>
+<li><b>CREAR_RAIZ(u)</b>.Construye un nuevo nodo <i>r</i> con etiqueta <i>u</i> y sin hijos.Se 
+devuelve el árbol con raíz <i>r</i>,es decir,un árbol con un único 
+nodo.</li><br>
+<li><b>DESTRUIR(T)</b>.Libera los recursos que mantienen el árbol <i>T</i> de forma que 
+para volver a usarlo se debe de asignar un nuevo valor con la operación de creación.</li><br>
+<li><b>PADRE(n,T)</b>.Esta función devuelve el padre del nodo <i>n</i> en el árbol 
+<i>T</i> .Si <i>n</i> es la raíz ,que no tiene padre,devuelve NODO_NULO(un valor que será 
+usado para indicar que hemos intentado salirnos del árbol).Como precondición <i>n</i> 
+no es NODO_NULO (por tanto <i>T</i> no es vacío).</li><br>.
+<li><b>HIJO_IZQDA(n,T)</b>.Devuelve el descendente más a la izquierda en el siguiente 
+nivel del nodo <i>n</i> en el árbol <i>T</i>, y devuelve NODO_NULO si <i>n</i> no tiene 
+hijo a la izquierda.Como precondición <i>n</i> no es NODO_NULO.</li><br>
+<li><b>HERMANO_DRCHA(n,T)</b>.Devuelve el descendiente a la derecha del nodo <i>n</i> en el árbol 
+<i>T</i> ,definido para ser aquel nodo <i>m</i> con el mismo padre que <i>n</i> ,es decir,
+padre <i>p</i>,de tal manera que <i>m</i> cae inmediatamente a la derecha de <i>n</i> en la 
+ordenación de los hijos de <i>p</i> (Por ejemplo,véase el árbol de la figura 6).
+Devuelve NODO_NULO si <i>n</i> no tiene hermano a la derecha.Como precondición <i>n</i> 
+no es NODO_NULO.
+<br><br><center><img src="ARBOLES%20GENERALES_archivos/arbgen6.gif"></center><br><br></li>
+<li><b>ETIQUETA(n,T)</b>.Devuelve la etiqueta del nodo <i>n</i> en el árbol <i>T</i>
+(manejaremos árboles etiquetados,sin embargo no es obligatorio definir etiquetas para cada 
+árbol).Como precondición <i>n</i> no es NODO_NULO.</li><br>
+<li><b>REETIQUETA(e,n,T)</b>.Asigna una nueva etiqueta <i>e</i> al nodo <i>n</i> en el árbol 
+<i>T</i>.Como precondición <i>n</i> no es NODO_NULO.</li><br>
+<li><b>RAIZ(T)</b>.Devuelve el nodo que está en la raíz del árbol <i>T</i> 
+o NODO_NULO si <i>T</i> es el árbol vacío.</li><br>
+<li><b>INSERTAR_HIJO_IZQDA(n,Ti,T)</b>.Inserta el árbol <i>Ti</i> como hijo a la izquierda 
+del nodo <i>n</i> que pertenece al árbol <i>T</i>.Como precondición <i>n</i> no es 
+NODO_NULO y <i>Ti</i> no es el árbol vacío.</li><br>
+<li><b>INSERTAR_HERMANO_DRCHA(n,Td,T)</b>.Inserta el árbol <i>Td</i> como hermano a la 
+derecha del nodo <i>n</i> que pertenece al árbol <i>T</i>.Como precondición <i>n</i> 
+no es NODO_NULO y <i>Td</i> no es el árbol vacío.</li><br>
+<li><b>PODAR_HIJO_IZQDA(n,T)</b>.Devuelve el subárbol con raíz hijo a la izquierda de 
+<i>n</i> del árbol <i>T</i> el cual se ve privado de estos nodos.Como precondición 
+<i>n</i> no es NODO_NULO.</li><br>
+<li><b>PODAR_HERMANO_DRCHA(n,T)</b>.Devuelve el subárbol con raíz hermano a la derecha 
+de <i>n</i> del árbol <i>T</i> el cual se ve privado de estos nodos.Como precondición 
+<i>n</i> no es NODO_NULO.</li>
+</ol>
+<p>A continuación veremos cómo implementar el TDA árbol y posteriormente 
+implementaremos los algoritmos de recorrido:PREORDEN,POSTORDEN,INORDEN.
+<br><br></p><h3>IMPLEMENTACIÓN DE ÁRBOLES.</h3>
+<br><h4><u>UNA IMPLEMENTACIÓN MATRICIAL</u></h4>
+<p>Sea <i>A</i> un árbol en el cual los nodos se etiquetan 0,1,2,...,n-1,es decir,cada 
+nodo contiene un campo de información que contendrá estos valores.La representación 
+más simple de <i>A</i> que soporta la operación PADRE es una matriz lineal <i>P</i> 
+en la cual el valor de <i>P[i]</i> es un valor o un cursor al padre del nodo <i>i</i>.La raíz 
+de <i>A</i> puede distinguirse dándole un valor nulo o un valor a él mismo como 
+padre.Por ejemplo.,podemos usar un esquema de cursores donde <i>P[i]=j</i> si el nodo <i>j</i> 
+es el padre del nodo <i>i</i>,y <i>P[i]=-1</i> (suponemos que NODO_NULO=-1) si el nodo <i>i</i> 
+es la raíz.La definición del tipo sería: 
+<br><br><code></code></p><pre><code>#define MAXNODOS 100                     /*Por ejemplo*/
+#define NODO_NULO -1
+
+typedef int nodo;                        /*Indica una casilla de la matriz*/
+typedef int *ARBOL;
+</code></pre><br><br>
+<p>Esta representación usa la propiedad de los árboles de que cada nodo tiene un 
+único padre.Con esta representación el padre de un nodo puede encontrarse en tiempo 
+constante.Un camino hacia arriba en el árbol puede seguirse atravesando el árbol 
+en tiempo proporcional al número de nodos en el camino.Podemos soportar también el 
+operador ETIQUETA añadiendo otra matriz <i>L</i> ,tal que <i>L[i]</i> es la etiqueta del nodo 
+<i>i</i> ,o haciendo que los elementos de la matriz <i>A</i> sean registros consistiendo en un 
+entero(cursor)y una etiqueta.EJEMPLO:Véase el árbol de la figura 7:
+<br><br></p><center><img src="ARBOLES%20GENERALES_archivos/arbgen7.gif"></center><br><br>
+<p>La representación de padre por cursores no facilita las operaciones que requieren 
+información de hijos.Dado un nodo <i>n</i> ,es costoso determinar los hijos de <i>n</i> 
+o la altura de <i>n</i>.Además,la representación por cursores del padre no especifica 
+el orden de los hijos de un nodo.Por tanto,operaciones como HIJO_IZQDA y HERMANO_DRCHA no están 
+bien definidas.Podríamos imponer un orden artificial,por ejemplo,numerando los hijos de 
+cada nodo después de numerar el padre,y numerar los hijos en orden creciente de izquierda 
+a derecha.
+</p><p><b>Nota:</b>Téngase en cuenta que aunque esta implementación no parece muy adecuada, 
+es posible ampliarla con la utilización de nuevos campos de cursores.Por ejemplo:Podemos 
+añadir dos matrices adicionales para almacenar para cada nodo tanto el hijo a la izquierda como 
+el hermano a la derecha.
+<br></p><h4><u>IMPLEMENTACIÓN DE ÁRBOLES POR LISTAS DE HIJOS</u></h4>
+<p>Una forma útil e importante de representar árboles es formar para cada nodo una 
+lista de sus hijos.Las listas pueden representarse por cualquier método,pero como el número 
+de hijos que cada nodo puede tener puede ser variable,las representaciones por listas enlazadas 
+son las más apropiadas.La figura 8 sugiere como puede representarse el árbol del ejemplo 
+de la figura 7:
+<br><br></p><center><img src="ARBOLES%20GENERALES_archivos/arbgen8.gif"></center>
+<p>Hay una matriz de celdas de cabecera indexadas por nodos ,que suponemos numerados <i>0,1,2,...,n-1.</i>
+Cada punto de cabecera apunta a una lista enlazada de elementos que son nodos.Los elementos 
+sobre una lista encabezada por <i>cabecera[i]</i> son los hijos de <i>i</i>(por ejemplo, 9 y 4 
+son los hijos de 8).Si desarrollamos la estructura de datos que necesitamos en términos 
+de un tipo de dato abstracto <i>tLista</i> (de nodos) y damos una implementación particular 
+de listas,puede verse como las abstracciones encajan.
+<br><br><code></code></p><pre><code>#include <listas.h>                      /*Definidas apropiadamente*/
+#define MAXNODOS 100                     /*Por ejemplo*/
+#define NODO_NULO -1
+
+typedef int nodo;                        
+typedef struct {
+	tLista cabecera[MAXNODOS];
+	tEtiqueta etiquetas[MAXNODOS];
+	nodo raiz;
+     }ARBOL;
+</listas.h></code></pre><br><br>
+<p>Suponemos que la raíz de cada árbol está almacenada explícitamente 
+en el campo raíz.El -1 en el campo raíz se usa para representar el árbol nulo o
+vacío.La siguiente función muestra el código para la operación 
+HIJO_IZQDA:
+<br><br><code></code></p><pre><code>nodo HIJO_IZQDA(nodo n,ARBOL T)
+{
+   tLista L;
+
+   L=T.cabecera[n];
+   if(PRIMERO(L)==FIN(L))
+      return NODO_NULO;                 /*No tiene hijos*/
+   else
+      return RECUPERA(PRIMERO(L),L);    /*Recupera el primero(izqda)*/
+}
+</code></pre><br><br>
+<p>Las demás operaciones son también fáciles de implementar utilizando la 
+anterior estructura para el tipo de dato y usando las primitivas del TDA <i>Lista</i>.
+</p><p><b>Nota:</b>Las funciones PRIMERO,FIN y RECUPERA usadas en el ejemplo anterior pertenecen 
+al TDA Lista anteriormente estudiado.
+<br></p><h4><u>IMPLEMENTACIÓN DE ÁRBOLES BASADA EN CELDAS ENLAZADAS</u></h4>
+<p>Al igual que ocurre en los TDA estudiados (<i>Listas,Pilas o Colas</i>), un nodo puede ser 
+declarado de forma que la estructura del árbol pueda ir en aumento mediante la obtención 
+de memoria de forma dinámica,haciendo una petición de memoria adicional cada vez 
+que se quiere crear un nuevo nodo.
+<br><br><code></code></p><pre><code>#define ARBOL_VACIO NULL
+#define NODO_NULO NULL
+
+typedef int tEtiqueta             /*Algún tipo adecuado*/
+typedef struct tipocelda{
+     struct tipocelda *padre,*hizqda,*herdrchaAr;
+     tEtiqueta etiqueta;
+    }*nodo;
+typedef nodo tArbol; 
+</code></pre><br><br>
+<p>Observemos que bajo esta implementación cada nodo de un árbol contiene 3 punteros:
+<i>padre</i> que apunta al padre,<i>hizqda</i> que apunta al hijo izquierdo y herdrcha que apunta 
+al hermano a la derecha del nodo.Para esta implementación de árbol vamos a presentar 
+las funciones primitivas de las que hablábamos al principio.Suponemos que para referenciar el 
+nodo <i>i</i> la variable puntero apuntará a ese nodo.Suponemos también unas variables 
+de tipo nodo y que la variable <i>T</i> de tipo árbol apunta a la raíz del árbol.
+<br><br><code></code></p><pre><code><b>nodo PadreAr(nodo n,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-padreAr">
+   </applet>
+<b>{</b>
+  return n-&gt;padre;
+<b>}</b>
+
+<b>nodo HizqdaAr(nodo n,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-hizqdaAr">
+   </applet>
+<b>{</b>
+  return n-&gt;hizqda;
+<b>}</b>
+
+<b>nodo HerdrchaAr(nodo n,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-herdrchaAr">
+   </applet>
+<b>{</b>
+  return n-&gt;herdrchaAr;
+<b>}</b>
+
+<b>tEtiqueta EtiquetaAr(nodo n,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-etiquetaAr">
+   </applet>
+<b>{</b>
+  return n-&gt;etiqueta;
+<b>}</b>
+
+<b>void ReEtiquetaAr(tEtiqueta e,nodo n,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-reEtiquetaAr">
+   </applet>
+<b>{</b>
+  n-&gt;etiqueta=e;
+<b>}</b>
+
+<b>nodo RaizAr(tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-raizAr">
+   </applet>
+<b>{</b>
+  return T;
+<b>}</b>
+
+<b>tArbol Crea0(tEtiqueta et)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-crear0">
+   </applet>
+<b>{</b>
+  tArbol raiz;
+  
+  raiz=(tArbol)malloc (sizeof(struct tipocelda));
+  if (!raiz){
+    error("Memoria Insuficiente.");
+  }
+  raiz-&gt;padre=NULL;
+  raiz-&gt;hizqda=NULL;
+  raiz-&gt;etiqueta=et;
+
+  return raiz;
+<b>}</b>
+
+<b>void Destruir(tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-destruir">
+   </applet>
+<b>{</b>
+  
+  if(T){
+     destruir(T-&gt;hizqda);
+     destruir(T-&gt;herdrcha);
+     free(T);
+  }
+<b>}</b>
+
+<b>void Insertar_hijo_izqda(nodo n,tArbol Ti,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-insertarHI">
+   </applet>
+<b>{</b>
+   
+  Ti-&gt;herdrcha=n-&gt;hizqda;
+  Ti-&gt;padre=n;
+  n-&gt;hizqda=Ti;
+<b>}</b>
+
+<b>void Insertar_hermano_drcha(nodo n,tArbol Td,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-insertarHD">
+   </applet>
+<b>{</b>
+   
+  if(n==raizAr(T)){
+    error("Memoria Insuficiente.");
+  }
+  Td-&gt;herdrcha=n-&gt;herdrcha;
+  Td-&gt;padre=n-&gt;padre;
+  n-&gt;herdrcha=Td;
+<b>}</b>
+
+<b>tArbol Podar_hijo_izqda(nodo n,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-podarHI">
+   </applet>
+<b>{</b>
+  tArbol Taux;
+   
+  Taux=n-&gt;hizqda;
+  if(Taux!=ARBOL_VACIO){
+    n-&gt;hizqda=Taux-&gt;herdrcha;
+    Taux-&gt;padre=NODO_NULO;
+    Taux-&gt;herdrcha=NODO_NULO;
+  }
+  
+  return Taux;
+<b>}</b>
+
+<b>tArbol Podar_hermano_drcha(nodo n,tArbol T)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-podarHD">
+   </applet>
+<b>{</b>
+  tArbol Taux;
+   
+  Taux=n-&gt;herdrcha;
+  if(Taux!=ARBOL_VACIO){
+    n-&gt;herdrcha=Taux-&gt;herdrcha;
+    Taux-&gt;padre=NODO_NULO;
+    Taux-&gt;herdrcha=NODO_NULO;
+  }
+
+  return Taux;
+<b>}</b>
+</code></pre><br><br>
+<p>Como vemos hemos implementado <i>creaRaiz</i> de manera que el árbol devuelto es un 
+único nodo.Es posible construir en C un procedimiento con un número variable de 
+parámetros:<br>
+</p><ul>
+<li>El primero de los parámetros una etiqueta para el nodo raíz.</li><br>
+<li>Los restantes parámetros de tipo <i>tArbol</i> que se insertarán como 
+subárboles(hijos) del nodo raíz.</li><br>
+</ul>
+<p>Los podemos realizar mediante la implementación de un número de parámetros 
+indeterminado y haciendo uso del tipo <i>va_list</i> que podemos encontrar en el fichero cabecera 
+<i>stdarg.h</i>.El procedimiento podría ser el siguiente:
+<br><br><code></code></p><pre><code><b>tArbol CreaRaiz(tEtiqueta et,tArbol T1,...,tArbol Tn,NULL)</b><applet align="RIGHT" codebase="../clases" code="proyec.class" name="proyec" width="150" height="40">
+    	<param name="tipo" value="funcionamiento">
+    	<param name="primi" value="ag-creaRaiz">
+   </applet>
+<b>{</b>
+  va_list ap;
+  nodo n,aux,raiz;
+
+  /*Reservamos memoria para el nodo raiz*/
+  raiz=(nodo)malloc(sizeof(struct tipocelda));
+  if(!raiz){
+    error("Memoria Insuficiente.");
+  }
+  /*Inicializamos el nodo raiz*/
+  raiz-&gt;padre=NULL;
+  raiz-&gt;hizqda=NULL;
+  raiz-&gt;herdrcha=NULL;
+  raiz-&gt;etiqueta=et;
+  /*Un bucle para insertar los subarboles*/
+  va_start(ap,et);          /*Inicio de argumentos*/
+  for(;;){
+    n=(nodo)va_arg(ap,nodo);
+    if(n==NULL)break;       /*No quedan mas hijos*/
+    if(raiz-&gt;hizqda)aux-&gt;herdrcha=n;
+    else raiz-&gt;hizqda=n;
+    aux=n;
+    aux-&gt;herdrcha=NULL;
+    aux-&gt;padre=raiz;
+  }
+  va_end(ap);               /*Final de argumentos*/
+  return(tArbol)raiz;
+<b>}</b>
+</code></pre><br><br>
+<p>La llamada a la función tendría como parámetros una etiqueta para el 
+nodo raíz del árbol resultante y una lista de nodos que podría ser vacía 
+en cuyo caso el árbol que resulta tiene un único nodo:su raíz con etiqueta <i>et</i>.
+Por último,después de dicha lista,es necesario un parámetro adicional(NULL) 
+que indica el final de la lista tras cuya lectura el procedimiento dejaría de añadir más 
+hijos al nodo raíz que se está construyendo.
+<br></p><h4><u>IMPLEMENTACIÓN DE LOS RECORRIDOS DE UN ÁRBOL</u></h4>
+<p>Recordemos que los recorridos de un árbol pueden ser de una forma directa en Preorden,
+Inorden y Postorden.A continuación veremos la implementación de estos tres recorridos.
+Así mismo,veremos un procedimiento de lectura de un árbol en preorden.
+<br></p><h4><u>PREORDEN</u></h4>
+<ol>
+<li>Visitar la raíz.</li><br>
+<li>Recorrer el subárbol más a la izquierda en preorden.</li><br>
+<li>Recorrer el subárbol de la derecha en preorden.</li><br>
+</ol>
+<p>Vamos a escribir dos procedimientos uno recursivo y otro no recursivo que toman un árbol 
+y listan las etiquetas de sus nodos en preorden.Supongamos que existen los tipos <i>nodo y tArbol</i> 
+con etiquetas del tipo <i>tEtiqueta</i> definidos anteriormente en la implementación por 
+punteros.El siguiente procedimiento muestra un procedimiento recursivo que , dado el nodo <i>n</i>,lista 
+las etiquetas en preorden del subárbol con raíz en <i>n</i>.
+<br><br><code></code></p><pre><code><b>void PreordenArbol(nodo n,tArbol T)
+{</b>
+  Escribir(etiquetaAr(n,T));
+  for(n=hizqdaAr(n,T);n!=NODO_NULO;n=herdrchaAr(n,T))
+    PreordenArbol(n,T);
+<b>}</b>
+</code></pre><br><br>
+<p>En esta función hemos supuesto que existe una rutina <i>Escribir</i> que tiene como 
+parámetro de entrada un valor de tipo <i>tEtiqueta</i> que se encarga de imprimir en la 
+salida estándar.Por ejemplo,si hemos realizado <i>typedef int tEtiqueta</i> la función 
+podría ser la siguiente:
+<br><br><code></code></p><pre><code><b>void Escribir(tEtiqueta et)
+{</b>
+  fprintf(stdout,"%d",(int)et);
+<b>}</b>
+</code></pre><br><br>
+<p>Por otro lado,en los programas C hemos usado el operador de desigualdad entre un dato de tipo 
+<i>nodo</i> y la constante <i>ARBOL_VACIO</i>.Para hacerlo más independiente de la impementación 
+sería conveniente programar una función que podríamos llamar <i>Arbol_Vacio</i> 
+que se añadiría como una nueva primitiva que nos devuelve si el subárbol que cuelga del nodo 
+es un árbol vacío.
+</p><p>Para el procedimiento no recursivo,usaremos una pila para encontrar el camino alrededor del 
+árbol.El tipo <i>PILA</i> es realmente pila de nodos,es decir,pila de posiciones de nodos.
+La idea básica subyacente al algoritmo es que cuando estamos en la posición <i>p</i>,la 
+pila alojará el camino desde la raíz a <i>p</i>,con la raíz en el fondo de 
+la pila y el nodo <i>p</i> a la cabeza.El programa tiene dos modos de operar.En el primer modo 
+desciende por el camino más a la izquierda en el árbol,escribiendo y apilando los nodos 
+a lo largo del camino,hasta que encuentra una hoja.A continuación el programa entra en el 
+segundo modo de operación en el cual vuelve hacia atrás por el camino apilado en 
+la pila,extrayendo los nodos de la pila hasta que se encuentra un nodo en el camino con un hermano 
+a la derecha.Entonces el programa vuelve al primer modo de operación,comenzando el descenso 
+desde el inexplorado hermano de la derecha.El programa comienza en modo uno en la raíz y termina 
+cuando la pila está vacía.
+<br><br><code></code></p><pre><code><b>void PreordenArbol(tArbol T)
+{</b>
+  pila P;    /*Pila de posiciones:tElemento de la pila es el tipo nodo*/
+  nodo m;
+  P=CREAR(); /*Funcion de creacion del TDA PILA*/
+
+  m=raizAr(T);
+  do{
+    if(m!=NODO_NULO){
+      Escribir(etiquetaAr(n,T));
+      PUSH(m,P);
+      m=hizqdaAr(m,T);
+    }
+    else if(!VACIA(P)){
+      m=herdrchaAr(TOPE(P),T);
+      POP(P);
+    }
+  }while(!VACIA(P));
+
+  DESTRUIR(P);          /*Funcion del TDA PILA*/
+<b>}</b>
+</code></pre><br><br>
+<br><h4><u>INORDEN</u></h4>
+<ol>
+<li>Recorrer el subárbol más a la izquierda en inorden.</li><br>
+<li>Visitar la raíz.</li><br>
+<li>Recorrer el subárbol del siguiente hijo a la derecha en inorden.</li>
+</ol>
+<p>Vamos a escribir un procedimiento recursivo para listar las etiquetas de sus nodos en inorden.
+<br><br><code></code></p><pre><code><b>void InordenArbol(nodo n,tArbol T)
+{</b>
+  nodo c;
+
+  c=hizqdaAr(n,T);
+  if(c!=NODO_NULO){
+    InordenArbol(c,T);
+    Escribir(etiquetaAr(n,T));
+    for(c=herdrchaAr(c,T);c!=NODO_NULO;c=herdrchaAr(c,T))
+      InordenArbol(c,T);
+  }
+  else Escribir(etiquetaAr(n,T));
+<b>}</b>
+</code></pre><br><br>
+<br><h4><u>POSTORDEN</u></h4>
+<ol>
+<li>Recorrer el subárbol más a la izquierda en postorden.</li><br>
+<li>Recorrer el subárbol de la derecha en postorden.</li><br>
+<li>Visitar la raíz.</li><br>
+</ol>
+<p>El procedimiento recursivo para listar las etiquetas de sus nodos en postorden es el siguiente:
+<br><br><code></code></p><pre><code><b>void PostordenArbol(nodo n,tArbol T)
+{</b>
+  nodo c;
+
+  for(c=hizqdaAr(n,T);c!=NODO_NULO;c=herdrchaAr(c,T))
+    PostordenArbol(c,T);
+
+  Escribir(etiquetaAr(n,T));
+<b>}</b>
+</code></pre><br><br>
+<br><h4><u>LECTURA</u></h4>
+<p>A continuación veremos un procedimiento que nos realizará la lectura de los nodos 
+de un árbol introduciéndolos en preorden.La función implementada se llama 
+<i>Lectura</i> aunque se listan dos funciones(la rutina <i>Lectura2</i> es una función 
+auxiliar que es usada por la primera).
+<br><br><code></code></p><pre><code><b>void Lectura2(nodo n,tArbol T)
+{</b>
+  tEtiqueta etHijo,etHermano;
+  tArbol Hijo,Hermano;
+
+  fprintf(stdout,"Introduce hijo_izqda de:  ");
+  Escribir(etiquetaAr(n,T));
+  Leer(&amp;etHijo);
+
+  if(comparar(etHijo,FINAL)){
+    Hijo=creaRaiz(etHijo);
+    insertar_hijo_izqda(n,Hijo,T);
+    Lectura2(hizqdaAr(n,T),T);
+  }
+
+  fprintf(stdout,"Introduce her_drcha de:   ");
+  Escribir(etiquetaAr(n,T));
+  Leer(&amp;etHermano);
+
+  if(comparar(etHermano,FINAL)){
+    Hermano=creaRaiz(etHermano);
+    insertar_hermano_drcha(n,Hermano,T);
+    Lectura2(herdrchaAr(n,T),T);
+  }
+<b>}</b>
+
+<b>tArbol Lectura()
+{</b>
+  tArbol T;
+  tEtiqueta et;
+
+  fprintf(stdout,"En caso de que no exista el hijo_izqdo o el"
+            "hermano_derecho introducir el valor: ");
+  Escribir(FINAL);           /*FINAL actua de centinela*/
+  fprintf(stdout,"\nIntroduce la raiz del arbol:  ");
+  Leer(&amp;et);
+  T=creaRaiz(et);
+  Lectura2(raizAr(T),T);
+<b>}</b>
+</code></pre><br><br>
+<p>Es interesante observar 5 puntos en esta rutina:<br>
+</p><ul>
+<li>Hemos supuesto que existe una función <i>Leer</i> que tiene como parámetro de 
+entrada un puntero a una zona de memoria que almacena un valor de tipo <i>tEtiqueta</i>,y que 
+sirve para leer de la entrada estándar un dato de ese tipo y almacenarlo en dicha zona 
+de memoria.</li><br>
+<li>Existe una variable <i>FINAL</i> que contiene un valor para la etiqueta que "no es legal" 
+para indicar la inexistencia de un hijo a la izquierda y/o de un hermano a la derecha.</li><br>
+<li>Suponemos que existe una función <i>comparar</i> que tiene como parámetros de 
+entrada dos variables de tipo <i>tEtiqueta</i> y que devuelve un valor entero distinto de 0 en caso 
+de que las variables sean distintas según el criterio implementado en la función.</li><br>
+<li>Las sentencias <i>insertar_hijo_izqda(...);Lectura2(...)</i>;no son intercambiables,es decir,si 
+hubieramos programado esas sentencias en otro orden (<i>Lectura2(...);insertar_hijo_izqda(...);</i>) 
+la función de lectura no funcionaría correctamente.La comprobación de que esta 
+afirmación es correcta se deja como ejercicio al lector.</li><br>
+<li>En la segunda sentencia <i>if</i> ocurre una situación similar al punto anterior.</li><br>
+<li>Se puede completar la rutina de lectura para que prescinda de la lectura de un posible hermano 
+a la derecha de la raíz simplemente preguntándonos si <i>n</i> es la raíz 
+del árbol <i>T</i>.</li><br>
+</ul>
+<br><br><br><hr>
+<b><center><address>
+<h6>Tutor de Estructuras de Datos Interactivo<br>
+<a href="mailto:jexpositoa@nexo.es">Exposito Lopez Daniel</a>,  
+<a href="mailto:abrahamgs@latinmail.com">Abraham García Soto</a>,
+<a href="mailto:x8110356@turing.ugr.es">Martin Gomez Antonio Jose</a><br>
+Director de proyecto:
+<a href="mailto:J.Fdez-Valdivia@decsai.ugr.es">Joaquín Fernández Valdivia</a><br>
+5º Licenciatura Informatica<br>
+ETSII 99/00 (Universidad de Granada).<br><br></h6>
+</address></center><b>
+
+
+</b></b></body></html>

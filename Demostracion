@@ -1,0 +1,64 @@
+
+"V f": mapPE f (sExp2pExp s) = sExp2pExp (mapSE (inversa f) s)
+
+induccion sobre la estructura de "s":
+
+1) caso base s= Empty
+
+mapPE f (sExp2pExp Empty)
+=		(sExp2pExp)
+mapPE f (Pred (\x -> False))
+=		(mapPE)
+Pred (const false.f)
+=		(trivial por const)
+Pred (const false)
+
+
+sExp2pExp (mapSE (inversa f) Empty)
+=		(mapSE)
+sExp2pExp Empty
+=		(sExp2pExp)
+Pred (const false)
+
+
+
+2)caso base s= Unit x
+
+mapPE f (sExp2pExp (Unit x))
+=		(sExp2pExp)
+mapPE f (Pred (x==))
+=		(mapPE)
+Pred ((x==) . f)
+
+
+
+sExp2pExp (mapSE (inversa f) (Unit x))
+=		(mapSE)
+sExp2pExp (Unit (inversa f x))
+=		(sExp2pExp)
+Pred (inversa f x ==)
+=		(por conmutatividad del ==)
+Pred (== inversa f x)
+=		(por lema del parcial)
+Pred ((x==) . f)
+
+
+3)caso inductivo: s= Union s1 s2
+
+HI1: ¡ mapPE f (sExp2pExp s1)= sExp2pExp (mapSE (inversa f) s1) !
+HI2: ¡ mapPE f (sExp2pExp s2)= sExp2pExp (mapSE (inversa f) s2) !
+TI: ¿ mapPE f (sExp2pExp (Union s1 s2))= sExp2pExp (mapSE (inversa f) (Union s1 s2)) ?
+
+Demostracion:
+
+mapPE f (sExp2pExp (Union s1 s2))
+=		(sExp2pExp)
+mapPE f (LOp OR (sExp2pExp s1) (sExp2pExp s2))
+=		(mapPE)
+LOp OR (mapPE f (sExp2pExp s1)) (mapPE f (sExp2pExp s2))
+=		(HI1 y HI2)
+LOp OR (sExp2pExp (mapSE (inversa f) s1)) (sExp2pExp (mapSE (inversa f) s2))
+=		(sExp2pExp)
+sExp2pExp (Union (mapSE (inversa f) s1) (mapSE (inversa f) s2))
+=		(mapSE)
+sExp2pExp (mapSE (inversa f) (Union s1 s2))

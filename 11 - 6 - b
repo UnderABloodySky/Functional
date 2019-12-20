@@ -1,0 +1,47 @@
+conCapasDe :: Pizza -> Pizza -> Pizza
+conCapasDe Prepizza p' = p'
+conCapasDe (Capa i p) p' = Capa i (conCapasDe p p') 
+
+cantidadCapasQueCumplen :: (Ingrediente -> Bool) -> Pizza -> Int
+cantidadCapasQueCumplen _ Prepizza = 0
+cantidadCapasQueCumplen f (Capa i p') = unoSiCumple f i + cantidadCapasQueCumplen f p' 
+
+unoSiCumple :: (a -> Bool) -> a -> Int
+unoSiCumple f x = if f x
+						then 1
+						else 0
+Prop: 
+cantidadCapasQueCumplen f (conCapasDe p1 p2) = ​ cantidadCapasQueCumplen f p1 + cantidadCapasQueCumplen f p2
+
+Dem:
+	Por principio de Induccion estructural en la estructura de p1 (p1 :: Pizza)
+
+Caso base: p1 = Prepizza
+
+cantidadCapasQueCumplen f (conCapasDe Prepizza p2)  
+=							(def conCapasDe.1)
+cantidadCapasQueCumplen f p2
+
+
+cantidadCapasQueCumplen f Prepizza + cantidadCapasQueCumplen f p2
+=							(def cantidadCapasQueCumplen.1)
+0 + cantidadCapasQueCumplen f p2
+=							(identidad)
+cantidadCapasQueCumplen f p2
+
+Caso base: p1 = Capa i p1'
+
+		HI: cantidadCapasQueCumplen f (conCapasDe p1' p2) = cantidadCapasQueCumplen f p1' + cantidadCapasQueCumplen f p2
+
+		TI: cantidadCapasQueCumplen f (conCapasDe (Capa i p1') p2)= cantidadCapasQueCumplen f (Capa i p1') + cantidadCapasQueCumplen f p2
+
+
+cantidadCapasQueCumplen f (conCapasDe (Capa i p1') p2)
+=						  (def conCapasDe.2)
+cantidadCapasQueCumplen f (Capa i (conCapasDe p1' p2))
+=						  (def cantidadCapasQueCumplen.2)
+unoSiCumple f i + cantidadCapasQueCumplen f (conCapasDe p1' p2)
+=						  (HI)
+unoSiCumple f i + cantidadCapasQueCumplen f p1' + cantidadCapasQueCumplen f p2
+=							(def cantidadCapasQueCumplen.2)
+cantidadCapasQueCumplen f (Capa i p1') + cantidadCapasQueCumplen f p2

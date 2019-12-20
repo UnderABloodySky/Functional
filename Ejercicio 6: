@@ -1,0 +1,113 @@
+--Ejercicio 6:
+
+A) Prop: length . capasQueCumplen f ​ = ​ cantidadDe f
+Dem: Por principio de extensionalidad 
+	
+	V p :: Pizza. (length . capaQueCumplen f) p = cantidadDe f p
+
+(length . capasQueCumplen f) p
+=						(def (.))
+length (capasQueCumplen f p)
+
+Por principio de Induccion estructural en la estructura de p (p :: Pizza). Sea p una Pizza fija, tal que:
+
+Caso base: p = Prepizza
+
+length (capasQueCumplen f Prepizza)
+=					(def capasQueCumplen.1)
+length []
+=					(def length.1)
+0
+=					(def cantidadDe.1)
+cantidadDe f Prepizza
+
+
+Caso inductivo: p = Capa i p'
+	HI: length (capasQueCumplen f p') = ​ cantidadDe f p'
+	TI: length (capasQueCumplen f (Capa i p')) = ​cantidadDe f (Capa i p')
+
+length (capasQueCumplen f (Capa i p'))
+=					(def capasQueCumplen.2)
+length (if f i 
+			then i : capasQueCumplen f p'
+			else capasQueCumplen f p')
+
+Si F i = True									Si F i = False
+
+length (i : capasQueCumplen f p') 				length (capasQueCumplen f p')
+=						(def length.2)			=					(HI)
+1 + length (capasQueCumplen f p')				cantidadDe f p'
+=						(HI)					
+1 + cantidadDe f p'
+=						(def cantidadDe.2)								
+cantidadDe f (Capa i p')
+
+												​cantidadDe f (Capa i p')
+												=					(def cantidadDe.2)
+												cantidadDe f p'
+												=					(HI)
+										
+Prop: cantidadCapasQueCumplen f (conCapasDe p1 p2) = ​ cantidadCapasQueCumplen f p1 + cantidadCapasQueCumplen f p2
+
+Dem: Por principio de Induccion estructural en la estructura de p1 (p1 :: Pizza)
+
+Caso base: p1 = Prepizza
+
+cantidadCapasQueCumplen f (conCapasDe Prepizza p2) 
+=							(def conCapasDe.1)
+cantidadCapasQueCumplen f p2
+=							(neutro +)
+0 + cantidadCapasQueCumplen f p2
+=							(def cantidadCapasQueCumplen.1)
+cantidadCapasQueCumplen f Prepizza + cantidadCapasQueCumplen f p2
+
+
+Caso inductivo: p1 = Capa i p1'
+
+	HI:	cantidadCapasQueCumplen f (conCapasDe p1' p2) = ​cantidadCapasQueCumplen f p1 + cantidadCapasQueCumplen f p2
+	Ti: cantidadCapasQueCumplen f (conCapasDe (Capa i p1') p2) = ​cantidadCapasQueCumplen f (Capa i p1') + cantidadCapasQueCumplen f p2
+
+
+cantidadCapasQueCumplen f (conCapasDe (Capa i p1') p2)
+=							(def conCapasDe.2)
+cantidadCapasQueCumplen f (Capa i (conCapasDe p1' p2))
+=							(def cantidadCapasQueCumplen.2)
+if f i //Preguntar!
+	then 1 + cantidadCapasQueCumplen f (conCapasDe p1' p2)
+	else cantidadCapasQueCumplen f (conCapasDe p1' p2)
+
+Si f i = True
+1 + cantidadDeCapasQueCumplen f (conCapasDe p1' p2)
+=							(HI)
+1 + cantidadCapasQueCumplen f p1 + cantidadCapasQueCumplen f p2
+=							(Asociatividad) //Preguntar!
+(1 + cantidadCapasQueCumplen f p1) + cantidadCapasQueCumplen f p2
+=							(def cantidadCapasQueCumplen.2)
+cantidadCapasQueCumplen f (Capa i p1) + cantidadCapasQueCumplen f p2
+
+Si f i = False
+cantidadCapasQueCumplen f (conCapasDe p1' p2)
+=							(HI)
+cantidadCapasQueCumplen f p1 + cantidadCapasQueCumplen f p2 //Preguntar!!
+
+
+
+
+
+
+conCapasDeExp :: Pizza -> Pizza -> Pizza
+conCapasDeExp Prepizza p' = p'
+conCapasDeExp (Capa i p) p' = Capa i (conCapasDeExp p p') 
+conCapasTransformadas f (conCapasDe p1 p2) = ​ conCapasDe (conCapasTransformadas f p1) (conCapasTransformadas f p2)
+
+cantidadCapasQueCumplen f . soloLasCapasQue f ​ = cantidadCapasQueCumplen
+
+
+
+
+
+
+
+
+
+

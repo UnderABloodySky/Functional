@@ -1,0 +1,16 @@
+
+data Nota = Do| Re | Mi
+data Compo = S Int | B Nota Int  | Ap Compo Compo | Ac Compo Compo 
+
+foldC :: (Int -> b) -> (Nota -> Int -> b) -> (b -> b -> b) -> (b -> b -> b) -> Compo -> b
+foldC s b ap ac (S n) = s n
+foldC s b ap ac (B n i) = b n i
+foldC s b ap ac (Ap c1 c2) = ap (foldC s b ap ac c1) (foldC s b ap ac c2)
+foldC s b ap ac (Ac c1 c2) = ac  (foldC s b ap ac c1) (foldC s b ap ac c2)
+
+silencios :: Compo -> [Int]
+silencios = foldC (:[]) (\_ _ -> []) (++) (++)
+
+ejemplo = Ap (Ac(B Do 4) (S 1)) 
+			(Ac (Ap (B Mi 16) (S 1)) 
+				(S 1))

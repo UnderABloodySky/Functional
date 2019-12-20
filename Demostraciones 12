@@ -1,0 +1,656 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+A) Demostrar que ​ evalExpA' es equivalente a ​ evalExpA (ejercicio 6.a.i de la práctica 8)
+
+evalExpA :: ExpA -> Int​
+evalExpA (Cte n) = n
+evalExpA (Sum e1 e2) = (+)  (evalEA e1) (evalEA e2) 
+evalExpA (Prod e1 e2) = (*) (evalEA e1) (evalEA e2) 
+
+evalExpA' = foldExpA​ id (+) (*)
+
+Preparacion preliminal:
+
+Prop: evalExpA = evalExpA'
+Dem: Por principio de extensionalidad:
+
+	V e :: ExpA . evalExpA e = evalExpA' e
+
+
+Por principio de induccion estructural en la estructura de e (e :: ExpA). Sea un e fijo tal que:
+
+Caso base: e = Cte n
+
+evalExpA (Cte n)
+=				(def evalExpA.1)
+n
+
+evalExpA' (Cte n)
+= 				(def evalExpA')
+foldExpA​ id (+) (*) (Cte n)
+=				(def foldExpA.1)
+id n
+=				(def id)
+n
+
+Caso inductivo: e: Sum e1 e2
+
+	HI1: evalExpA e1 = evalExpA' e1
+ 	HI2: evalExpA e2 = evalExpA' e2
+	TI: evalExpA (Sum e1 e2) = evalExpA' (Sum e1 e2)
+	
+evalExpA (Sum e1 e2)
+=				(def evalExpA.2)
+(+)  (evalEA e1) (evalEA e2) 
+=				(HI1)
+(+) (evalExpA' e1) (evalExpA e2) 
+=				(HI2)
+(+) (evalExpA' e1) (evalExpA' e2)
+=				(def evalExpA') 
+(+) (foldExpA id (+) (*) e1) (evalExpA' e2)
+=				(def evalExpA')
+(+) (foldExpA id (+) (*) e1) (foldExpA id (+) (*) e2)
+=				(def foldExpA.2)
+foldExpA id (+) (*) (Sum e1 e2)
+=				(def evalExpA')
+evalExpA' (Sum e1 e2)
+
+Caso inductivo: e: Sum e1 e2
+
+	e: Prod e1 e2
+
+	HI1: evalExpA e1 = evalExpA' e1
+ 	HI2: evalExpA e2 = evalExpA' e2
+	TI: evalExpA (Prod e1 e2) = evalExpA' (Prod e1 e2)
+	
+evalExpA (Prod e1 e2)
+=				(def evalExpA.2)
+(*)  (evalEA e1) (evalEA e2) 
+=				(HI1)
+(*)  (evalEA' e1) (evalEA e2) 
+=				(HI2)
+(*)  (evalEA' e1) (evalEA e2') 
+=				(def evalExpA') 
+(*) (foldExpA id (+) (*) e1) (evalExpA' e2)
+=				(def evalExpA') 
+(*) (foldExpA id (+) (*) e1) (foldExpA id (+) (*) e2)
+=				(def foldExpA.3) 
+foldExpA id (+) (*) (Prod e1 e2)
+=				(def evalExpA')
+evalExpA' (Prod e1 e2)
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+B) Demostrar que ​ evalEA' es equivalente a ​ evalEA (ejercicio 1.a.i de la práctica 9).
+
+evalEA :: EA -> Int
+--que describe el número que resulta de evaluar la cuenta representada por la expresión aritmética dada.
+evalEA (Const n) = n
+evalEA (BOp binop e1 e2) = evalBinop binop (evalEA2 e1) (evalEA2 e2)
+
+evalBinop :: BinOp -> Int -> Int -> Int 
+evalBinop Suma = (+)
+evalBinop Mul = (*)
+
+foldEA :: (Int -> b) -> (BinOp -> b -> b -> b) -> EA -> b
+foldEA c b (Const n) = c n 
+foldEA c b (BOp binop e1 e2) = b binop (foldEA c b e1) (foldEA c b e2)
+
+evalEA2' = foldEA id evalBinop
+
+Preparacion preliminal:
+
+Prop: evalEA = evalEA'
+Dem: Por principio de extensionalidad:
+
+	V e :: EA . evalEA e = evalEA' e
+
+
+Por principio de induccion estructural en la estructura de e (e :: EA). Sea un e fijo tal que:
+
+
+Caso base: e = Const n
+
+evalEA (Const n)
+=				(def evalEA.1)
+n
+
+
+evalEA' (Const n)
+=				(def evalEA')
+foldEA id evalBinop (Const n)
+=				(def foldEA.1)
+id n
+=				(def id)
+n
+
+Caso Inductivo: e = BOp binop e1 e2
+	
+	HI1: evalEA' e1 = evalEA e1
+	HI2: evalEA' e2 = evalEA e2   
+	TI: evalEA' (BOp binop e1 e2) = evalEA (BOp binop e1 e2)  
+
+evalEA' (BOp binop e1 e2)
+=					(def evalEA')
+foldEA id evalBinop (BOp binop e1 e2)
+=					(def foldEA.2)
+evalBinop binop (foldEA id evalBinop e1) (foldEA id evalBinop e2)
+=					(def evalEA'.2)
+evalBinop binop (evalEA' e1) (foldEA id evalBinop e2)
+=					(def evalEA'.2)
+evalBinop binop (evalEA' e1) (evalEA'  e2)
+=					(HI1)
+evalBinop binop (evalEA e1) (evalEA'  e2)
+=					(HI2)
+evalBinop binop (evalEA e1) (evalEA  e2)
+=					(def evalEA.3)
+evalEA (BOp binop e1 e2)
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+C) Demostrar las siguientes propiedades utilizando las definiciones anteriores:
+
+
+foldT :: b -> (a -> b -> b -> b) -> Tree a -> b
+foldT b fn EmptyT = b
+foldT​ b fn (NodeT x t1 t2) = fn x (foldT​ b fn t1) (foldT​ b fn t2)
+
+
+sizeT = foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2)
+
+mapT f = foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2)
+	
+
+Prop:	sizeT . mapT f ​ = ​ sizeT
+dem: Por princicio de extencionalidad
+	
+		V t :: Tree a . (sizeT . mapT) t = sizeT t
+
+	Por definicion (.)
+
+		V t :: Tree a . sizeT (mapT t) = sizeT t
+
+	Por induccion estructural en la estructura de t (t :: Tree a). Sea t un Tree fijo, tal que:
+
+Caso base: t = EmptyT
+
+sizeT (mapT f EmptyT)
+=				(def mapT)
+sizeT (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) EmptyT)
+=				(def foldT.1)
+sizeT EmptyT
+=				(def sizeT)
+foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2) EmptyT
+=				(def foldT.1)
+1
+
+
+sizeT EmptyT
+=				(def sizeT)
+foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2) EmptyT
+=				(def foldT.1)
+1
+
+
+Caso Inductivo: t = NodeT x t1 t2
+			
+			HI1: sizeT (mapT t1) = sizeT t1
+			HI2: sizeT (mapT t2) = sizeT t2
+			Ti: sizeT (mapT (NodeT x a1 a2)) = sizeT (NodeT x a1 a2)
+
+sizeT (mapT f(NodeT x a1 a2))
+=					(def mapT)
+sizeT (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) (NodeT x a1 a2))
+=					(def foldT.2)
+sizeT ((\a t1 t2 -> NodeT (f a) t1 t2) x (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)
+										 (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a2))
+=					(def foldT.2)
+sizeT (NodeT (f x) (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)
+				   (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a2))
+=					(def sizeT)
+foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2) (NodeT (f x) (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)
+				   (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a2))
+=					(def foldt.2)
+(\ _ n1 n2 -> suma3 1 n1 n2) (f x) foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2) 
+										(foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)
+								   	foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2) 
+								   		(foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)
+=					(beta)
+suma3 1 (foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2) 
+										(foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)) 
+		(foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2) 
+								   		(foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1))
+=					(def. sizeT)
+suma3 1 (sizeT (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)) 
+		(foldT​ 1 (\ _ n1 n2 -> suma3 1 n1 n2) 
+								   		(foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)) 
+=					(def. sizeT)
+suma3 1 (sizeT (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a1)) 
+		(sizeT (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a2))
+=					(def mapT) 
+suma3 1 (sizeT (mapT f a1)) 
+		(sizeT (foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) a2))
+=					(def mapT) 
+suma3 1 (sizeT (mapT f a1))
+		(sizeT (mapT f a2))
+=					(HI1) 
+suma3 1 (sizeT a1)
+		(sizeT (mapT f a2))
+=					(HI2) 
+suma3 1 (sizeT a1)
+		(sizeT a2)			
+
+
+sizeT (NodeT x a1 a2)
+=					(def sizeT)
+foldT (\ _ n1 n2 -> suma3 1 n1 n2) (NodeT x a1 a2)
+=					(def foldT.2)
+(\ _ n1 n2 -> suma3 1 n1 n2) x (foldT (\ _ n1 n2 -> suma3 1 n1 n2) a1) 
+							    (foldT (\ _ n1 n2 -> suma3 1 n1 n2) a2)
+=					(BETA)
+suma3 1 (foldT (\ _ n1 n2 -> suma3 1 n1 n2) a1)
+		(foldT (\ _ n1 n2 -> suma3 1 n1 n2) a2)
+=					(def sizeT)
+suma3 1 (sizeT a1)
+		(foldT (\ _ n1 n2 -> suma3 1 n1 n2) a2)
+=					(def sizeT)
+suma3 1 (sizeT a1)
+		(sizeT a2)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+mapT f = foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2)
+mapT f = foldT EmptyT (NodeT . f)
+Prop: mapT f . mapT g ​ = ​ mapT (f . g)
+Dem: Por principio de extensionalidad
+	
+	V t :: Tree a . (mapT f . mapT g) t =​ mapT (f . g) t
+
+	 Por definicion (.) es equivalente a demostrar:
+
+	V t :: Tree a . mapT f (mapT g) t =​ mapT (f . g) t
+
+Por principio de induccion estructural en la estructura de t ( t:: Tree a). Sea t un arbol fijo tal que:
+
+Caso base: t = EmptyT
+
+mapT f (mapT g EmptyT)
+=			(def mapT)
+map f (foldT​ EmptyT (\a t1 t2 -> NodeT (g a) t1 t2) EmptyT)
+=			(def foldT.1)
+mapT f EmptyT
+=			(def mapT)
+foldT​ EmptyT (\a t1 t2 -> NodeT (f a) t1 t2) EmptyT
+=			(def foldT.1)
+EmptyT
+
+
+mapT (f . g) EmptyT
+=				(def mapT)
+foldT​ EmptyT (\a t1 t2 -> NodeT ((f . g) a) t1 t2) EmptyT
+=				(def foldT.1)
+EmptyT
+
+
+Caso inductivo: t = NodeT x a1 a2
+
+			HI1: mapT f (mapT g a2) = mapT (f . g) a1
+			HI2: mapT f (mapT g a2) = mapT (f . g) a2
+			TI: mapT f (mapT g (NodeT x a1 a2)) = mapT (f . g) (NodeT x a1 a2)
+
+mapT f (mapT g (NodeT x a1 a2))
+=						(def mapT)	
+mapT f (foldT EmptyT (NodeT . g) (NodeT x a1 a2))
+=						(def foldT.2)	
+mapT f ((NodeT . g) x (foldT EmptyT (NodeT . g) a1) 
+					  (foldT EmptyT (NodeT . g) a2))
+=						(def (.))
+mapT f (NodeT (g x) (foldT EmptyT (NodeT . g) a1) 
+					(foldT EmptyT (NodeT . g) a2))
+=						(def mapT)
+mapT f (NodeT (g x) (mapT g a1) 
+					(foldT EmptyT (NodeT . g) a2))
+=						(def mapT)
+mapT f (NodeT (g x) (mapT g a1) 
+					(mapT g a2))
+=						(def mapT)
+foldT EmptyT (NodeT . f) (NodeT (g x) (mapT g a1) 
+									  (mapT g a2))
+=						(def foldT.2)
+(NodeT . f) (g x)   (foldT EmptyT (NodeT . f) (mapT g a1)) 
+					(foldT EmptyT (NodeT . f) (mapT g a2))
+=						(def (.))
+NodeT (f (g x))     (foldT EmptyT (NodeT . f) (mapT g a1)) 
+     				(foldT EmptyT (NodeT . f) (mapT g a2))
+=						(def (.))
+NodeT ((f.g) x)     (foldT EmptyT (NodeT . f) (mapT g a1)) 
+     				(foldT EmptyT (NodeT . f) (mapT g a2))
+=						(def mapT)
+NodeT ((f.g) x)     (mapT f (mapT g a1)) 
+     				(foldT EmptyT (NodeT . f) (mapT g a2))
+=						(def mapT)
+NodeT ((f.g) x)     (mapT f (mapT g a1)) 
+     				(mapT f (mapT g a2))
+=						(HI1)
+NodeT ((f.g) x)     (mapT (f.g) a1) 
+     				(mapT f (mapT g a2))
+=						(HI2)
+NodeT ((f.g) x)     (mapT (f.g) a1) 
+     				(mapT (f.g) a2)
+=						(def mapT)
+NodeT ((f . g) x)  (foldT EmptyT (NodeT . (f.g)) a1)
+					(mapT (f.g) a1)
+=						(def MapT)
+NodeT ((f . g) x) (foldT EmptyT (NodeT . (f.g)) a1) 
+				   (foldT EmptyT (NodeT . (f.g)) a2)
+=						(def mapT)
+NodeT ((f . g) x) (foldT EmptyT (NodeT . (f.g)) a1) 
+				   (foldT EmptyT (NodeT . (f.g)) a2)
+=						(def (.))
+(NodeT . (f.g)) x (foldT EmptyT (NodeT . (f.g)) a1) 
+				  (foldT EmptyT (NodeT . (f.g)) a2) 
+=						(def foldT.2)
+foldT EmptyT (NodeT . (f.g)) (NodeT x a1 a2)
+=						(def mapT)
+mapT (f.g) (NodeT x a1 a2)
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+foldT NodeT EmptyT ​ = ​ id
+
+Para que coincida con la definicion de foldT
+
+Prop: foldT EmptyT NodeT ​ = ​ id
+Dem: Por principio de extensionalidad
+	
+	V t :: Tree a . foldT EmptyT NodeT t​ = ​ id t
+
+	Por principio de Induccion estructuraal en la estructura de t (t :: Tree a). Sea t un Tree fijo, tal que:
+
+Caso base: t = EmptyT
+
+foldT EmptyT NodeT EmptyT 
+=					(def foldT)
+EmptyT
+
+id EmptyT
+=			(def id)
+EmptyT
+
+Caso inductivo: t = NodeT x a1 a2
+
+		HI1: foldT EmptyT NodeT a1 = ​ id a1
+		HI2: foldT EmptyT NodeT a2 = ​ id a2
+		TI: foldT EmptyT NodeT (NodeT x a1 a2)​ = ​ id (NodeT x a1 a2)
+
+foldT EmptyT NodeT (NodeT x a1 a2)
+=						(def foldT.2)
+NodeT x (foldT EmptyT NodeT a1) (foldT EmptyT NodeT a2)
+=						(HI1)
+NodeT x (id a1) (foldT EmptyT NodeT a2)
+=						(HI2)
+NodeT x (id a1) (id a2)
+=						(def id)
+NodeT x a1 (id a2)
+=						(def id)
+NodeT x a1 a2
+=						(def id)
+id (NodeT x a1 a2)
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+E) Demostrar la siguiente propiedad:
+
++Lema 1:
+Prop: any (==x) xs = elem x xs 
+Dem: Por principio de induccion estructural en la estructura de xs. (xs :: [a]). Sea xs una [a] fija tal que:
+
+Caso base: xs = []
+
+any (==x) [] 
+=			(def any.1)
+False
+
+elem x xs []
+=			(def elem.1)
+False
+
+Caso inductivo: xs = x' : xs'
+
+	HI: any (==x) xs' = elem x xs'
+	TI: any (==x) (x':xs') = elem x (x':xs')
+
+any (==x) (x':xs') 
+=				(def any.2)
+(==x) x' || any (==x) xs'
+=				(HI)
+(==x) x' || elem x xs'
+=				(Notacion)
+x == x' || elem x xs'
+=				(def elem.2)
+elem x (x':xs)
+
+--------------------------------------------------------------------------------------------------------------
+
++Lema 2
+
+Prop:  any (elem x) (appendLevels xss yss) = any (elem x) xss || any (elem x) yss
+
+Dem: Por principio de induccion estructural en la estructura de xss. (xss :: [[a]]) Sea xs una Lista de listas fija tal que:
+
++Caso base: xss = []
+
+any (elem x) (appendLevels [] yss)
+=						(def appendLevels.1)
+any (elem x) yss		OK
+
+any (elem x) xss || any (elem x) yss
+=						(def any.1)
+False || any (elem x) yss
+=						(Identidad)
+any (elem x) yss		OK
+
+
+any (elem x) [] || any (elem x) yss
+=						(def any.1)
+False || any (elem x) yss
+=						(Identidad)
+any (elem x) yss		OK
+
+
++Caso inductivo: xss = xs : xss'
+
+		Por principio de induccion estructural en la estructura de ys. Sea ys (:: [a]) una Lista fija tal que:
+
+*Caso base: yss = []
+
+any (elem x) (appendLevels (xs : xss') [])
+=							(def appendLevels.1)
+any (elem x) (xs : xss')
+=							(def any.2)
+elem x xs || any (elem x ) xss'				OK
+
+any (elem x) (xs:xss') || any (elem x) []
+=							(def any.1)
+any (elem x) (xs:xss') || False
+=							(Identidad)
+any (elem x) (xs:xss') 
+=							(def any.2)
+elem x xs || any (elem x) xss'				OK
+
+*Caso inductivo yss = ys : yss'
+	
+		HI: any (elem x) (appendLevels xss' yss') = 
+			any (elem x) xss' || any (elem x) yss'
+		
+		TI: any (elem x) (appendLevels (xs : xss') (ys : yss')) = 
+			any (elem x) (xs : xss') || any (elem x) (ys : yss')
+
+any (elem x) (appendLevels (xs : xss') (ys : yss')) 
+=								(appendLevels.3)
+any (elem x) ((xs ++ ys) : appendLevels xss' yss')
+=								(def any.2)
+elem x (xs ++ ys) || any (elem x) (appendLevels xss' yss')
+=								(HI)
+elem x (xs ++ ys) || any (elem x) xss' || any (elem x) yss'
+=								(Lema 3)
+elem x xs || elem x ys || any (elem x) xss' || any (elem x) yss'
+=								(Conmutatibilidad)
+elem x xs || any (elem x) xss' || elem x ys || any (elem x) yss'
+=								(def any.2)
+any (elem x) (x:xss') || elem x ys || any (elem x) yss'
+=								(def any.2)
+any (elem x) (x:xss') || any (elem x) (ys:yss')
+
+--------------------------------------------------------------------------------------------------------------
+
++Lema 3:
+
+Prop: elem x (xs ++ ys) = elem x xs || elem x ys
+Dem: Por principio deinduccion estructural en la estructura de xs.
+
+- Caso base: xs = []
+
+elem x ([] ++ ys)
+=			(def (++).1)
+elem x ys
+=			(Identidad)
+False || elem x ys
+=			(def elem.1)
+elem x [] || elem x ys 
+
+- Caso inductivo: xs = x' : xs' 
+		HI: elem x (xs' ++ ys) = elem x xs' || elem x ys
+		Ti: elem x ((x' : xs') ++ ys) = elem x (x' : xs') || elem x ys
+
+elem x ((x' : xs') ++ ys)
+=						(def (++).2)
+elem x (x': (xs' ++ ys))
+=						(def elem.2)
+x == x'|| elem x (xs' ++ ys)
+=						(HI)
+x == x'|| elem x xs' || elem x ys
+=						(def elem.2)
+elem x  (x':xs') || elem x ys
+
+--------------------------------------------------------------------------------------------------------------
+
+Prop: has (==x) ​ = ​ any (elem x) . objectsPerLevel
+Dem: 
+	Por principio de extensionalidad:
+
+	V m :: Mapa a . has (==x) m​ = ​ (any (elem x) . objectsPerLevel) m
+
+	Por definicion del (.)
+
+	V m :: Mapa a . has (==x) m​ = ​ any (elem x) (objectsPerLevel m)
+
+	Por principio de Induccion estructural en la estructura de m (m:: Mapa). Sea m un Mapa a fijo tal que:
+
+
+*Caso base: m = Cofre xs
+
+has (==x) (Cofre xs)
+=					(def has)
+foldM (any (==x)) id (\os b1 b2 -> any f os || b1 || b2) (Cofre xs)
+=					(def foldM.1)
+any (==x) xs
+=					(lema1)
+elem x xs 
+
+
+any (elem x) (objectsPerLevel (Cofre xs))
+=								(def objectPerLevel)
+any (elem x) (foldM (:[]) (\ lr -> [] : lr) (\xs l1 l2 -> xs : appendLevels l1 l2 ) (Cofre xs))
+=								(def foldM.1)
+any (elem x) (xs:[])
+=								(def any.2)
+elem x xs || any elem x []
+=								(def any.1)												
+elem x xs || False
+=								(Identidad)
+elem x xs 
+
+
+*Caso inductivo: m = Nada m'
+			HI: has (==x) m' 		= any (elem x) (objectsPerLevel m')
+			TI: has (==x) (Nada m') = any (elem x) (objectsPerLevel (Nada m'))
+
+any (elem x) (objectsPerLevel (Nada m'))
+=								(def objectPerLevel)
+any (elem x) (foldM singular (\ lr -> [] : lr) (\xs l1 l2 -> xs : appendLevels l1 l2 ) (Nada m'))
+=								(def foldM.2)
+any (elem x) ([] : foldM singular (\ lr -> [] : lr)  (\xs l1 l2 -> xs : appendLevels l1 l2 ) m')
+=								(def foldM.2)
+any (elem x) ([] : objectPerLevel m')
+=								(def any.2)
+elem x [] || any (elem x) (objectPerLevel m') 
+=								(def elem.2)
+False || any (elem x) (objectPerLevel m') 
+=								(Identidad)
+any (elem x) objectPerLevel m'				OK
+
+
+has (==x) (Nada m')
+=					(def has)
+foldM (any (==x)) id (\os b1 b2 -> any f os || b1 || b2) (Nada m')
+=					(def foldM.2)
+id (foldM (any (==x)) id (\os b1 b2 -> any f os || b1 || b2) m')
+=					(def has)
+id (has (==x) m')
+=					(def id)
+has (==x) m'
+=					(HI)
+any (elem x) (objectsPerLevel m')			OK
+
+
+* Caso inductivo: m = Bifurcacion xs m1 m2
+
+			HI1: has (==x) m1 		= any (elem x) (objectsPerLevel m1)
+			HI2: has (==x) m2 		= any (elem x) (objectsPerLevel m2)
+			TI: has (==x) (Bifurcacion xs m1 m2) = any (elem x) (objectsPerLevel (Bifurcacion xs m1 m2))
+
+has (==x) (Bifurcacion xs m1 m2)
+=								(def has)
+foldM (any (==x)) id (\os b1 b2 -> any (==x) os || b1 || b2) (Bifurcacion xs m1 m2)
+=								(def foldM.3)
+(\os b1 b2 -> any f os || b1 || b2) xs (foldM (any (==x)) id (\os b1 b2 -> any (==x) os || b1 || b2) m1) (foldM (any (==x)) id (\os b1 b2 -> any (==x) os || b1 || b2) m2)
+=								(Beta)
+any (==x) xs || foldM (any (==x)) id (\os b1 b2 -> any (==x) os || b1 || b2) m1
+		 || foldM (any (==x)) id (\os b1 b2 -> any (==x) os || b1 || b2) m2
+=								(def has)
+any (==x) xs || has (==x)) 
+		 || foldM (any (==x)) id (\os b1 b2 -> any (==x) os || b1 || b2) m2 
+=								(def has)
+any (==x) xs || has (==x) m1 || has (==x) m2 
+=								(HI1)
+any (==x) xs || any (elem x) (objectsPerLevel m1) || has (==x) m2 
+=								(HI2)
+any (==x) xs || any (elem x) (objectsPerLevel m1) || any (elem x) (objectsPerLevel m2)
+
+
+any (elem x) (objectsPerLevel (Bifurcacion xs m1 m2))
+=								(def. objectPerLevel)
+any (elem x) (foldM singular (\ lr -> [] : lr) (\xs l1 l2 -> xs : appendLevels l1 l2 ) (Bifurcacion xs m1 m2))
+=								(def foldM.3)
+any (elem x) ((\xs l1 l2 -> xs : appendLevels l1 l2 ) xs
+			(foldM singular (\ lr -> [] : lr) (\xs l1 l2 -> xs : appendLevels l1 l2 ) m1) 
+			(foldM singular (\ lr -> [] : lr) (\xs l1 l2 -> xs : appendLevels l1 l2 ) m2))
+=								(def objectPerLevel)
+any (elem x) ((\xs l1 l2 -> xs : appendLevels l1 l2 ) xs (objectPerLevel m1)
+					(foldM singular (\ lr -> [] : lr) (\xs l1 l2 -> xs : appendLevels l1 l2 ) m2))
+=								(def objectPerLevel)
+any (elem x) ((\xs l1 l2 -> xs : appendLevels l1 l2 ) xs (objectPerLevel m1) (objectPerLevel m2))
+=					(Beta)
+any (elem x) (xs : appendLevels (objectPerLevel m1) (objectPerLevel m2))
+=					(def any.2)
+elem x xs || any (elem x) (appendLevels (objectPerLevel m1) (objectPerLevel m2))
+=					(lema 1)
+any (==x) xs || any (elem x) (appendLevels (objectPerLevel m1) (objectPerLevel m2)) 
+=					(lema 2)
+any (==x) xs || any (elem x) (objectPerLevel m1) || any (elem x) (objectPerLevel m2)) 

@@ -1,0 +1,106 @@
+- Prop: cantidadAceitunas.conDescM = cantidadAceitunas
+- Dem:				// Hago esto para no tener que usar la def (.) en varios lugares durante la demostración,
+				// y me conviene hacerlo en la menor cantidad de lugares posibles.
+				
+					(cantidadAceitunas.conDescM) p
+					=						(def (.))
+					cantidadAceitunas (conDescM p)
+- Por principio de extensionalidad:
+				(a)				(b)
+	V p :: Pizza. cantidadAceitunas (conDescM p) p = cantidadAceitunas p
+
+- Por principio de Induccion estructural en la estructura de p (p :: Pizza)
+Sea p una Pizza fija tal que:
+
+	Caso base: p = Prepizza
+a)															
+cantidadAceitunas (conDescM Prepizza)						
+=					(def conDescM.1)						
+cantidadAceitunas Prepizza									
+=					(def cantidadAceitunas.1)
+0
+=				(def cantidadAceitunas.1)
+cantidadAceitunas Prepizza //Llegue a (b)
+
+	Caso inductivo: p = Capa i p'
+
+-HI: cantidadAceitunas (conDescM p') = cantidadAceitunas p')
+-TI: cantidadAceitunas (conDescM (Capa i p')) = cantidadAceitunas (Capa i p')
+
+a)
+cantidadAceitunas (conDescM (Capa i p'))
+=					(conDescM.2)
+cantidadAceitunas (juntar i (conDescM p'))	 
+=					(lema)
+aceitunas i + cantidadAceitunas (conDescM p')
+=					(HI)
+aceitunas i + cantidadAceitunas p'
+=					(def  cantidadAceitunas.2)
+cantidadAceitunas (Capa i p')
+
+
+LEMA:
+		(c)				  (d)
+Prop: cantidadAceitunas (juntar i p) = aceitunas i + cantidadAceitunas p
+Dem: 
+	Sea i :: Ingrediente y p :: Pizza
+
+c)																									cantidadAceitunas (juntar i p)
+Si i == Aceitunas n
+	Si p == Capa (Aceitunas m) p'
+		cantidadAceitunas (juntar (Aceitunas n) (Capa (Aceitunas m) p') 					
+		=					(def juntar.1)
+		cantidadAceitunas (Capa (Aceitunas (n+m)) p')
+		=					(def cantidadAceitunas.2)
+		aceitunas (Aceitunas (n+m)) + cantidadAceitunas p'
+		=					(def aceitunas.1)
+		(n + m) + cantidadAceitunas p' 
+		=					(Asociatividad)
+		n + m + cantidadAceitunas p'
+
+	Si p != Capa (Aceitunas _) p'
+		cantidadAceitunas (juntar (Aceitunas n) p)
+		= 							(def juntar.2)
+		cantidadAceitunas (Capa (Aceituna n) p)
+		=							(def cantidadAceitunas.2)
+		aceitunas (Aceitunas n) + cantidadAceitunas p
+		=							(def aceitunas.1)
+		n + cantidadAceitunas p
+		
+Si i != Aceitunas _
+		cantidadAceitunas (juntar i p) 					
+		=					(def juntar.2)
+		cantidadAceitunas (Capa i p)
+		=					(def cantidadAceitunas.2)
+		aceitunas i + cantidadAceitunas p
+		=					(def aceitunas.2)
+		0 +  cantidadAceitunas p
+		=					(identidad)
+		cantidadAceitunas p
+
+
+d) aceitunas i + cantidadAceitunas p
+
+aceitunas i + cantidadAceitunas p
+
+Si i == Aceitunas n
+	Si p == Capa (Aceitunas m) p'
+		aceitunas (Aceitunas n) + cantidadAceitunas (Capa (Aceitunas m) p')
+		=									(def aceitunas.1)
+		n + cantidadAceitunas (Capa (Aceitunas m) p')
+		=									(def cantidadAceitunas.2)
+		n + aceitunas (Aceitunas m) + cantidadAceitunas p' 
+		=									(def aceitunas.1)
+		n + m + cantidadAceitunas p' 
+
+	Si p != Capa (Aceitunas m) p'
+		aceitunas (Aceitunas n) + cantidadAceitunas p
+		=									(def aceitunas.1)
+		n + cantidadAceitunas p 		
+
+Si i != Aceitunas _
+	aceitunas i + cantidadAceitunas p
+	=										(def aceitunas.2)
+	0 + cantidadAceitunas p 
+	=										(identidad)
+	cantidadAceitunas p 

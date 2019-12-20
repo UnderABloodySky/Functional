@@ -1,0 +1,48 @@
+myScanr :: (a -> b -> b) -> b -> [a] -> [b]
+myScanr _ z [] =  [z]  
+myScanr f z (x:xs) = f x (head (myScanr f z xs)) : myScanr f z xs  
+
+myScanr (+) 2 [4,8]
+=					(def myScanr.2)
+(+) 4 (head (myScanr (+) 2 [8])) : myScanr (+) 2 [8]  
+=					(def myScanr.2)
+(+) 4 (head ((+) 8 (head (myScanr (+) 2 [])) : myScanr (+) 2 [])) : myScanr (+) 2 [8]  
+=					(def myScanr.1)
+(+) 4 (head ((+) 8 (head [2]) : [2])) : myScanr (+) 2 [8]  
+=					(def head.2)
+(+) 4 (head ((+) 8 2 : [2])) : myScanr (+) 2 [8]  
+=					(def (+))
+(+) 4 (head (10 : [2])) : myScanr (+) 2 [8]  
+=					(def head.2)
+(+) 4 10 : myScanr (+) 2 [8]  
+=					(def (+))
+14 : myScanr (+) 2 [8]  
+=					(def myScanr.2)
+14 : (+) 8 (head(myScanr (+) 2 [])) : myScanr (+) 2 []
+=					(def myScanr.1)
+14 : (+) 8 (head(myScanr (+) 2 [])) : [2]
+=					(def myScanr.1)
+14 : (+) 8 (head [2]) : [2]
+=					(def head.2)
+14 : (+) 8 2 : [2]
+=					(def (+))
+14 : 10 : [2]
+=					(def (:))
+14 : [10,2]
+=					(def (:))
+[14,10,2]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

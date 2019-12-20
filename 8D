@@ -1,0 +1,49 @@
+Prop: foldr ((+) . suma’) 0 ​ = ​ sum . map suma’
+Dem:
+
+Por principio de extensionalidad:
+						
+						(a)									(b)
+	V ps :: [(Int, Int)]. foldr ((+) . suma’) 0 ​ = ​ sum . map suma’
+	
+Por principio de induccion estructural, en la estructura de ps (:: [(Int, Int)]). Sea ps una lista fija tal que:
+
+Caso base: ps = []
+
+a)
+foldr ((+) . suma’) 0 ​ []
+=					(def foldr.1)
+0
+
+b)
+(sum . map suma') []
+=					(def (.))
+sum (map suma' [])
+=					(def map.1)	
+sum []
+=					(def sum)
+0
+
+
+Caso inductivo: ps = (p : ps')
+
+	HI: foldr ((+) . suma’) 0 ​ ps' = ​ (sum . map suma’) ps'
+	TI: foldr ((+) . suma’) 0 ​ (p:ps') = ​ (sum . map suma’) (p:ps') 
+a)
+foldr ((+) . suma’) 0 ​ (p:ps')
+=					(def foldr.2)
+((+).suma') p (foldr ((+).suma') 0 ps')
+=					(def (.))
+(+) (suma'p) (foldr ((+).suma') 0 ps')
+=					(HI)
+(+) (suma' p) ((sum . map suma’) ps')
+=					(def (.))
+(+) (suma' p) (sum (map suma’ ps'))
+=					(notacion)
+(suma' p) + (sum (map suma’ ps'))
+=					(def sum.2)
+sum  (suma' p : map suma' ps')
+=					(def map.2)
+sum  (map suma' (p:ps')))
+=					(def (.))
+(sum .map suma') (p:ps')

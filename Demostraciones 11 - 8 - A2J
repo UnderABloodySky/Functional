@@ -1,0 +1,533 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+A)
+
+- Prop: map f . map g ​ = ​ map (f . g)
+- Dem:
+
+	Por principio de extensionalidad:
+
+		V xs :: [a] . (map f . map g) xs = map (f.g) xs
+
+	Por principio de Induccion estructural en la estructura de xs (xs :: [a]). Sea xs una Lista fija, tal que:
+
+(map f . map g) xs
+=				(def (.))
+map f (map g xs)
+
+		map f (map g xs) = map (f.g) xs
+	
+
+* Caso base: xs = []
+
+map f (map g [])
+=				(def map.1)
+map f []
+=				(def map.1)
+[]
+=				(def map.1)
+map (f.g) []
+
+
+* Caso inductivo: xs = x : xs' 
+		
+		HI: map f (map g xs') = map (f.g) xs'
+		TI: map f (map g (x:xs')) = map (f.g) (x:xs')
+
+map f (map g (x:xs'))
+=				(def map.2)
+map f (g x : map g xs')
+=				(def map.2)
+f (g x) : map f (map g xs')
+=				(def (.))
+(f.g) x : map f (map g xs')
+=				(HI)
+(f.g) x : map (f.g) xs'
+=				(def map.2)
+map (f.g) (x:xs')
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+B)
+
+Prop: map f (xs ++ ys) ​ = ​ map f xs ++ map f ys
+Dem: 
+
+	Por principio de induccion estructural en la estructura de xs. (xs :: [a]). Sea xs una Lista fija tal que:
+
+
+* Caso base: xs = []
+
+map f [] ++ map f ys
+=				(def map.1)
+[] ++ map f ys
+=				(def (++).1)
+map f ys
+
+
+map f ([] ++ ys)
+=				(def (++).1)
+map f ys
+
+
+* Caso inductivo: xs = x : xs' 
+		
+		HI: map f (xs' ++ ys) ​= map f xs' ++ map f ys
+		TI: map f ((x:xs') ++ ys) ​ = ​ map f (x:xs') ++ map f ys
+
+map f ((x:xs') ++ ys)
+=				(def (++).2)
+map f (x : (xs' ++ ys))
+=				(def map.2)
+f x : map (xs' ++ ys)
+=				(HI)
+f x : map f xs' ++ map f ys
+=				(Asociatividad)
+(f x : map f xs') ++ map f ys
+=				(def map.2)
+map f (x:xs') ++ map f ys
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+C)
+
+Prop: concat . map (map f) ​ = ​ map f . concat
+Dem:
+
+	Por principio de extensionalidad
+
+		V xss ::[[a]] . (concat.map(map f)) xs = (map f . concat ) xss
+
+
+(concat.map(map f)) xss 
+=				(def (.))
+concat (map (map f) xss)
+
+
+(map f . concat ) xs 
+=				(def (.))
+map f (concat xs)
+
+	Por principio de Induccion estructural en la estructura de xs (xss::[[a]]) Sea xs una Lista fija, tal que:
+
+		concat (map (map f) xss) = map f (concat xss)
+
+* Caso base: xss = [] 
+
+concat (map (map f) [])
+=				(def map.1)
+concat []
+=				(def concat.1)
+[]
+
+map f (concat [])
+=				(def concat.1)
+map f [] 
+=				(def map.1)
+[]
+
+
+* Caso inductivo: xss = xs : xss'
+		
+		HI: concat (map (map f) xss') = map f (concat xss')
+		TI: concat (map (map f) (xs : xss')) = map f (concat (xs : xss'))
+
+map f (concat (xs : xss'))
+=						(def concat.2)
+map f (xs ++ concat xss')
+=						(dem B)
+map f xs ++ map f (concat xss')  
+=						(HI)
+map f xs ++ concat (map (map f) xss')
+=						(def concat.2)
+concat (map f xs : map (map f) xss')
+=						(def map.2)
+concat (map (map f) (xs:xss'))
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+D)
+
+Prop: foldr ((+) . suma’) 0 ​ = ​ sum . map suma’
+Dem: 
+	Por principio de extensionalidad:
+
+		V ps :: (Int, Int) . foldr ((+) . suma’) 0 ​ ps = ​ (sum . map suma’) ps
+
+	Por principio de Induccion estructural en la estructura de ps (ps :: [(Int, Int)]). Sea ps una Lista fija, tal que:
+
+
+* Caso base: ps = []
+
+
+(sum.map suma') []
+= 					(def (.))
+sum (map suma' [])
+=					(def map.1)
+sum []
+=					(def suma')
+0
+=					(def.foldr.1)
+foldr ((+) . suma’) 0 ​ []
+
+
+* Caso inductivo: ps = p : ps'
+
+		HI: foldr ((+) . suma’) 0 ​ ps' = ​ (sum . map suma’) ps'
+		TI: foldr ((+) . suma’) 0 ​ (p : ps') = ​ (sum . map suma’) (p : ps')
+
+foldr ((+) . suma’) 0 ​ (p : ps') 
+=					(def foldr.2)
+((+) . suma') p (foldr ((+) . suma') 0 ps') 
+=					(def (.))
+(+) (suma' p) (foldr ((+) . suma') 0 ps')
+=					(HI)
+(+) (suma' p) (sum . map suma’) ps'
+=					(def (.))
+(+) (suma' p) (sum (map suma’ ps'))
+=					(notacion)
+suma' p + sum (map suma’ ps')
+=					(def sum.2)
+sum (suma' p: map suma’ ps')
+=					(def map.2)
+sum (map suma’ (p:ps'))
+
+
+myFoldr :: (a -> b -> b) -> b -> [a] -> b
+myFoldr _ b [] = b
+myFoldr f b (x:xs) = f x (myFoldr f b xs) 
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+E)
+
+Prop: foldr f z . foldr (:) [] ​ = ​ foldr f z
+Dem:
+	Por principio de extensionalidad
+
+		V xs :: [a] . (foldr f z . foldr (:) []) xs ​ = ​ foldr f z xs
+
+	Por principio de Induccion estructural, en la estructura de xs. (xs :: [a]) Sea xs una Lista fija, tal que:
+
+* Caso base: xs = []
+
+* caso inductivo: xs = x : xs'
+
+		HI: (foldr f z . foldr (:) []) xs' ​ = ​ foldr f z xs'
+		TI: (foldr f z . foldr (:) []) (x : xs') ​ = ​ foldr f z (x : xs')
+
+(foldr f z . foldr (:) []) (x : xs')
+=						(def (.))
+foldr f z (foldr (:) [] (x : xs'))
+=						(LEMA0)
+foldr f z (id (x : xs'))
+=						(def id)
+foldr f z (x : xs')
+
+
++LEMA0:
+
+Prop: fold (:) [] = id
+Dem: 
+	
+	Por principio de extensionalidad.
+
+		V xs :: [a] .  fold (:) [] xs = id xs
+
+	Por principio de Induccion estructural en la estructura de xs (xs :: [a]). Sea xs una Lista fija tal que:
+
+
+* Caso base: xs = []
+
+fold (:) [] []
+=				(def foldr.1)
+[]
+=				(def id)
+id []	
+
+
+* Caso inductivo: xs = x : xs'
+
+		HI: fold (:) [] xs' = id xs'
+		TI: fold (:) [] (x:xs') = id (x:xs')
+
+foldr (:) [] (x:xs')
+=				(def foldr.1)
+(:) x (foldr (:) [] xs')  
+=				(HI)
+(:) x (id xs')
+=				(def id)
+(:) x xs'  
+=				(def (:))
+x:xs'
+=				(def id)
+id (x:xs')
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+F)
+
+Prop: foldr f z (xs ++ ys) ​ = ​ foldr f (foldr f z ys) xs
+Dem:
+		Por principio de Induccion estructural, en la estructura de xs. (xs :: [a]). Sea xs una Lista fija tal que:
+
+* Caso base: xs = []
+
+foldr f z ([] ++ ys)
+=				(def (++).1)
+foldr f z ys
+
+
+foldr f (foldr f z ys) []
+=				(def fold.1)
+foldr f z ys
+
+
+* Caso inductivo: xs = x : xs'
+
+		HI: foldr f z (xs' ++ ys) ​ = ​ foldr f (foldr f z ys) xs'
+		TI: foldr f z ((x:xs') ++ ys) ​ = ​ foldr f (foldr f z ys) (x:xs') 
+
+foldr f z ((x:xs') ++ ys)
+=				(def (++).2)
+foldr f z (x:(xs') ++ ys)
+=				(def foldr.2)
+f x (foldr f z (xs' ++ ys))
+=				(HI)
+f x (foldr f (foldr f z ys) xs')
+=				(def foldr.2)
+foldr f (foldr f z ys) (x:xs')
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+G)
+
+
+Prop: (+1) . foldr (+) 0 ​ = ​ foldr (+) 1
+Dem:
+	Por principio de extensionalidad:
+
+		V ns :: [Int]. ((+1) . foldr (+) 0) ns ​ = ​ foldr (+) 1 ns
+
+	Por principio de Induccion estructural, en la estructura de ns (ns :: [Int]). Sea ns una Lista fija, tal que:
+
+	((+1) . foldr (+) 0) ns ​ = ​ foldr (+) 1 ns
+
+((+1) . foldr (+) 0) ns 
+=					(def (.))
+(+1) (foldr (+) 0 ns)
+
+	(+1) (foldr (+) 0 ns)​ = ​ foldr (+) 1 ns
+
+
+* Caso base: ns = []
+
+(+1) (foldr (+) 0 [])​ 
+=				(def foldr.1)
+(+1) 0
+=				(def (+))
+1
+=				(def foldr.1)
+foldr (+) 1 []
+
+
+* Caso inductivo: ns = n : ns'
+
+			HI: (+1) (foldr (+) 0 ns')​ = ​ foldr (+) 1 ns'
+			TI: (+1) (foldr (+) 0 (n : ns'))​ = ​ foldr (+) 1 (n : ns')
+
+(+1) (foldr (+) 0 (n : ns'))
+=				(def foldr.2)
+(+1) ((+) n (foldr (+) 0 ns'))
+
+
+foldr (+) 1 (n:ns')
+=				(def foldr.2)
+(+) n (foldr (+) 1 ns')
+=				(HI)
+(+) n ((+1) (foldr (+) 0 ns'))
+=				(Notacion)
+n + (+1) (foldr (+) 0 ns')
+=				(Notacion, Asociatividad)
+n + 1 + (foldr (+) 0 ns'
+=				(conmutatibilidad)
+1 + n + (foldr (+) 0 ns'
+=				(Notacion, Asociatividad)
+1 + ((+ n) foldr (+) 0 ns')
+=				(def foldr.2)
+1 + (foldr (+) 0 (n:ns'))
+=				(notacion)
+(+1) (foldr (+) 0 (n:ns'))
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+H)
+
+Siendo:
+
+many :: Int -> (a -> a) -> a -> a
+many 0 f = id
+many n f = f . many (n - 1) f
+
+		many n f ​x = foldr (.) id (replicate n f) 
+
+	Por principio de induccion estructural, en la estructura de los numeros. Sea m un numero fijo tal que:
+
+Caso base: m = 0
+
+foldr (.) id (replicate 0 f)
+=				(def replicate.1)
+foldr (.) id []
+=				(def foldr.1)
+id
+=				(def many.1)
+many 0 f ​
+
+
+Caso inductivo: m = (n+1)
+
+	HI: many m f = foldr (.) id (replicate m f) 
+	TI: many (m+1) f = foldr (.) id (replicate (m+1) f) 
+
+foldr (.) id (replicate (m+1) f)
+=				(def replicate.2)
+foldr (.) id (f : replicate ((m+1)-1) f)
+=				(Asociatividad, aritmetica)
+foldr (.) id (f : replicate m f)
+=				(def foldr.2)
+(.) f (foldr (.) id (replicate m f))
+=				(HI)
+(.) f (many m f)
+=				(Notacion)
+f . (many m f)
+=				(def many.2)
+many (m+1) f ​
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+I)
+
+Prop: zipWith (f . swap) ​ = ​ map (uncurry f) . flip zip
+Dem: 
+	Por principio de extensionalidad:
+
+		V xs::[a] . zipWith (f . swap)​ xs = ​ (map (uncurry f) . flip zip) xs
+
+	Por principio de extensionalidad:
+
+		V yx :: [b] . V xs::[a] . zipWith (f . swap)​ xs ys = ​ (map (uncurry f) . flip zip) xs ys
+
+
+(map (uncurry f) . flip zip) xs ys
+=					(def (.))
+map (uncurry f) (flip zip xs ys) 
+
+		zipWith (f . swap)​ xs ys = map (uncurry f) (flip zip xs ys)
+						f (swap x) y					f y x
+	Por principio de Induccion estructural en la estructura de xs. (xs :: [a]). Sea xs una Lista fija tal que:
+
+* Caso base: xs = []
+
+
+zipWith (f . swap)​ [] ys
+=					(def zipWith.1)
+[]
+
+
+map (uncurry f) (flip zip [] ys)
+=					(def flip.1)
+map (uncurry f) (zip ys [])
+=					(def zip.1)
+map (uncurry f) []
+=					(def map.1)
+[]
+
+
+* Caso inductivo: xs = x : xs'
+	
+	HI:  zipWith (f . swap)​ xs' ys = map (uncurry f) (flip zip xs' ys)
+	HI': zipWith (f . swap)​ xs' ys' = map (uncurry f) (zip ys' xs')
+	TI:  zipWith (f . swap)​ (x : xs') ys = map (uncurry f) (flip zip (x : xs') ys)
+
+I)
+map (uncurry f) (flip zip (x : xs') ys)
+=					(def flip)
+map (uncurry f) (zip ys (x : xs'))
+			
+
+II)
+zipWith (f . swap)​ (x : xs') ys'
+
+			Por principio de Induccion estructural en la estructura de ys. (ys :: [b]). Sea ys una Lista fija, tal que:
+
+			* Caso base: ys = []
+
+				I)
+				map (uncurry f) (zip [] (x : xs'))
+				=					(def zip.1)
+				map (uncurry f) []
+				=					(def map.1)
+				[]
+
+				II)
+				zipWith (f . swap)​ (x : xs') []
+				=					(def zipewith.1)
+				[]
+					
+
+			* Caso inductivo: ys = y : ys' 
+
+				I)
+				map (uncurry f) (zip (y : ys') (x : xs'))
+				=					(def zip.2)
+				map (uncurry f) ((y,x) : zip ys' xs')
+				=					(def map.2)
+				uncurry f (y,x) : (map (uncurry f) (zip ys' xs'))
+				=					(def uncurry)
+				f y x : (map (uncurry f) (zip ys' xs'))
+				=					(HI')
+				f y x : zipWith (f . swap)​ xs' ys'
+				
+
+				II)
+				zipWith (f . swap)​ ((x : xs') (y : ys')
+				=					(def zipWith.2)
+				(f . swap) x y : zipWith (f . swap)​ xs' ys'
+				= 					(def (.))
+				f (swap x) y : zipWith (f . swap)​ xs' ys'
+				=					(HI)
+				f (swap x) y :map (uncurry f) (zip ys' xs')
+
+				
+
+
++Definiciones:
+
+uncurry :: (a -> b -> c) -> (a,b) -> c
+uncurry f (x,y) = f x y
+
+flip :: (a -> b -> c) -> b -> a -> c
+flip f x y = f y x
+
+zip :: [a] -> [b] -> [(a,b)]
+zip _ [] = []
+zip [] _ = []
+zip (x:xs) (y:ys) = (x,y) : zip xs ys
+
+swap :: (a,b) -> (b,a)
+swap (x,y) = (y,x)
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+J) (Desafío)​ ​ Dar un ejemplo de uso específico de esta propiedad
+
+Si h (f x y) ​ = ​ g x (h y)
+entonces​ h . foldr f z ​ = ​ foldr g (h z)

@@ -1,0 +1,48 @@
+conCapasTransformadas :: (Ingrediente -> Ingrediente) -> Pizza -> Pizza
+conCapasTransformadas _ Prepizza = Prepizza
+conCapasTransformadas f (Capa i pizza) = Capa (f i) (conCapasTransformadas f pizza)
+
+conCapasDe :: Pizza -> Pizza -> Pizza
+conCapasDe Prepizza p' = p'
+conCapasDe (Capa i p) p' = Capa i (conCapasDe p p') 
+
+
+Prop: 
+
+conCapasTransformadas f (conCapasDe p1 p2) = conCapasDe (conCapasTransformadas f p1) (conCapasTransformadas f p2)
+
+Dem:
+	Por principio de induccion estructural en la estructura de p1 (p1 :: Pizza). Sea p1 una Pizza fija tal que:
+
+
+Caso base: p1 = Prepizza
+
+conCapasTransformadas f (conCapasDe Prepizza p2)
+=						(def conCapasDe.1)
+conCapasTransformadas f p2
+
+
+conCapasDe (conCapasTransformadas f Prepizza) (conCapasTransformadas f p2)
+=						(def conCapasTransformadas.1)
+conCapasDe Prepizza (conCapasTransformadas f p2)
+=						(conCapasDe.1)
+conCapasTransformadas f p2
+
+
+Caso inductivo: p1 = Capa i p1'
+	
+	HI:conCapasTransformadas f (conCapasDe p1' p2) = conCapasDe (conCapasTransformadas f p1') (conCapasTransformadas f p2)
+ 
+	TI:conCapasTransformadas f (conCapasDe (Capa i p1') p2) = conCapasDe (conCapasTransformadas f (Capa i p1')) (conCapasTransformadas f p2)
+ 
+conCapasTransformadas f (conCapasDe (Capa i p1') p2)
+=						(def conCapasDe.2)
+conCapasTransformadas f (Capa i (conCapasDe p1' p2))
+=						(def conCapasTransformadas.2)
+Capa (f i) (conCapasTransformadas f (conCapasDe p1' p2))
+=						(HI)
+Capa (f i) (conCapasDe (conCapasTransformadas f p1') (conCapasTransformadas f p2))
+=						(def conCapasDe.2) 
+conCapasDe (Capa (f i) (conCapasTransformadas f p1')) (conCapasTransformadas f p2)
+=						(def conCapasTransformadas.2)
+conCapasDe (conCapasTransformadas f (Capa i p1')) (conCapasTransformadas f p2)

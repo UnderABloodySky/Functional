@@ -1,0 +1,67 @@
+capasQueCumplen' :: (Ingrediente -> Bool) -> Pizza -> [Ingrediente]
+capasQueCumplen'  _ Prepizza = []
+capasQueCumplen'  f (Capa i p) = if f i 
+									then i : capasQueCumplen f p
+									else capasQueCumplen f p
+
+cantidadDe :: (Ingrediente -> Bool) -> Pizza -> Int
+cantidadDe _ Prepizza = 0
+cantidadDe f (Capa i pizza) = if f i
+									then 1 + cantidadDe f pizza
+									else cantidadDe f pizza
+
+Prop: length . capasQueCumplen f ​ = ​ cantidadDe f
+
+
+para deshacerseme del (.)
+
+(length . capasQueCumplen f) p
+=							(def (.))
+length (capasQueCumplen f p)
+
+
+Dem: 
+
+	Por principio de extensionalidad:
+
+	V p :: Pizza . length (capasQueCumplen f p) = ​ cantidadDe f p
+
+	Por principio de Induccion estructural, en la estructura de p (p :: Pizza), dado una pizza fija p tal que:
+
+
+* Caso base: p = Prepizza
+
+length (capasQueCumplen f p) 
+=							(def capasQueCumplen.1)
+0
+
+cantidadDe f Prepizza
+=							(def cantidadDe.1)
+0
+
+
+* Caso inductivo: p = Capa i p'
+		HI: length (capasQueCumplen f p') ​ = ​ cantidadDe f p'
+		TI: length (capasQueCumplen f (Capa i p')) ​ = ​ cantidadDe f (Capa i p')
+
+length (capasQueCumplen f (Capa i p')) 
+=							(def capasQueCumplen.2)
+
+- Si F i = True												
+
+length (i : capasQueCumplen f p')												
+=							(def length.2) 					
+1 + length (capasQueCumplen f p')                       
+=							(HI)						
+1 + cantidadDe f p'										
+=							(def cantidadDe.2)
+cantidadDe f (Capa i p')
+
+
+-Si F i = False
+
+length (capasQueCumplen f p')
+=							(HI)
+cantidadDe f p'
+=							(def cantidadDe.2)
+cantidadDe f (Capa i p')

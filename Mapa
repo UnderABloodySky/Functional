@@ -1,0 +1,61 @@
+data Mapa a = Cofre [a]
+			| Nado (Mapa a)  
+			| Bifurcacion [a] (Mapa a) (Mapa a)
+
+
+foldM :: ([a]-> b) -> (b -> b) ([a] -> b -> b -> b) -> Mapa a -> b			
+foldM c n b (Cofre xs) = c xs
+foldM c n b (Nodo m) = n (foldM c n b m) 
+foldM c n b (Bifurcacion x m1 m2) = b xs (foldM c n b m1) (foldM c n b m2)
+
+recM :: ([a] -> b) -> (Mapa a -> b -> b) -> ([a] -> Mapa a -> b -> Mapa a -> b -> b) -> Mapa a -> b
+recM c n b (Cofre xs) = c xs
+recM c n b (Nodo m) = n m (recM c n b m) 
+recM c n b (Bifurcacion xs m1 m2) = b xs m1 (recM c n b m1) m2 (recM c n b m2)
+
+object :: Mapa a -> [a]
+object = foldM id id (\l1 l2 l2 -> l1 ++ l2 ++ l3)
+
+mapM :: (a -> b) -> Mapa a ->  Mapa b
+mapM = \f -> foldM (Cofre . map f) Nada (Bifurcacion . map f)
+
+hasObject :: 
+hasObject = \p -> foldM f g h
+where f xs [] = any p xs
+	  f _ _ = False
+	  g r (S:ds) = r ds
+	  g r _ = False
+	  h xs r1 r2 [] = any p xs
+	  h xs r1 r2 (L : ds) = h r1 ds
+	  h xs r1 r2 (R : ds) = h r2 ds
+	  h xs r1 r2 _ = False
+
+longestPath
+longestPath = foldM  (const [])
+					 (S :)
+					 (\_ r1 r2 -> if length r1 > length r2
+					 							then L : r1
+					 							else R: r2)
+
+//Si el dato que quiero no sirve para resolver lo que quiero, usar recR no usar fold
+//no alcanzaba con la informacion de la recursion
+objectOfLongerPath :: Mapa a -> [a]
+objectOfLongerPath = recM id id (\xs m1 r1 m2 r2 -> if longest m1 m2
+																then xs ++ r1
+																else xs ++ r2)    	  
+
+objectPerLevel :: Mapa a -> [[a]] //si usamos zipWith, hay que concatenar las listas no vacias del pattern.
+objectPerLevel 
+				(:[]) //ver esto    (\xs -> [xs])
+				([]:)				(\r -> [] : r)
+									(\xs r1 r2 -> )
+
+
+has (==xs) = any (elem k) . objectPerLevel
+
+Desarrollo preliminar:
+
+
+Caso m = Cofre xs
+
+
